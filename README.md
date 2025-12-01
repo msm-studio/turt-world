@@ -1,36 +1,192 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Turt World
+
+A whimsical, friendly platformer game where you choose from 4 adorable characters and navigate through themed levels. Built with Next.js, TypeScript, Rapier2D physics, and Supabase.
+
+## Features
+
+- **4 Unique Characters** with distinct physics properties:
+  - Turtle: Slower but heavier (less air control)
+  - Pig: Balanced physics with faster acceleration
+  - Lemur: Lightweight, extra air control, higher jumps
+  - Axolotl: Slowest movement but can float slightly longer in air
+
+- **Themed Levels**: Desert, Jungle, Arctic, and Urban landscapes
+- **Real Physics**: Powered by Rapier2D for smooth, responsive gameplay
+- **Leaderboard System**: Submit scores and compete with others
+- **Beautiful UI**: Warm, whimsical art style with smooth animations
+
+## Tech Stack
+
+- **Frontend**: Next.js 15 + React + TypeScript
+- **Physics Engine**: Rapier2D
+- **Database**: Supabase (PostgreSQL)
+- **Styling**: Tailwind CSS
+- **Deployment**: Vercel
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
 
+- Node.js 18+ installed
+- A Supabase account (free tier works great)
+- A GitHub account
+- A Vercel account (optional, for deployment)
+
+### Installation
+
+1. Clone the repository:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/yourusername/turt-world.git
+cd turt-world
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Install dependencies:
+```bash
+npm install
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+3. Set up Supabase:
+   - Create a new project at [supabase.com](https://supabase.com)
+   - Go to SQL Editor and run the schema from `db/schema.sql`
+   - This will create the tables and insert default characters and the first level
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+4. Configure environment variables:
+   - Copy `.env.local` and update with your Supabase credentials:
+```env
+NEXT_PUBLIC_SUPABASE_URL=your-project-url.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+```
 
-## Learn More
+5. Run the development server:
+```bash
+npm run dev
+```
 
-To learn more about Next.js, take a look at the following resources:
+6. Open [http://localhost:3000](http://localhost:3000) in your browser
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Project Structure
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```
+turt-world/
+├── app/                    # Next.js app directory
+│   └── page.tsx           # Main entry point
+├── components/
+│   └── game/              # Game React components
+│       ├── Game.tsx       # Main game container
+│       ├── CharacterSelect.tsx  # Character selection screen
+│       ├── Canvas.tsx     # Game canvas and loop
+│       └── UI.tsx         # HUD and game UI
+├── game/                  # Core game engine
+│   ├── physics.ts         # Rapier2D physics system
+│   ├── entities.ts        # Player, Platform, Hazard classes
+│   ├── input.ts           # Keyboard handling
+│   ├── animation.ts       # Sprite animation system
+│   └── levels.ts          # Level loader and manager
+├── db/                    # Database layer
+│   ├── supabase.ts        # Supabase client and queries
+│   └── schema.sql         # Database schema
+└── assets/                # Game assets (sprites, sounds)
+```
 
-## Deploy on Vercel
+## Game Controls
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- **Arrow Keys** or **WASD**: Move left/right
+- **Space** or **W/Up Arrow**: Jump (hold for higher jump)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## How to Add New Characters
+
+1. Open your Supabase SQL Editor
+2. Insert a new character:
+
+```sql
+INSERT INTO characters (name, speed, jump_force, mass, air_control, float_time, description) VALUES
+  ('NewCharacter', 3.5, 13.5, 1.8, 0.4, 0, 'Your character description');
+```
+
+3. Update the character colors and emojis in `components/game/CharacterSelect.tsx`:
+
+```typescript
+const characterColors: Record<string, string> = {
+  // ... existing characters
+  NewCharacter: 'bg-purple-600 hover:bg-purple-700',
+};
+
+const characterEmojis: Record<string, string> = {
+  // ... existing characters
+  NewCharacter: '🦔',
+};
+```
+
+4. The character will automatically appear in the character selection screen!
+
+## How to Design New Levels
+
+Levels are stored as JSON in the Supabase `levels` table. Here's how to add one:
+
+1. Open your Supabase SQL Editor
+2. Insert a new level:
+
+```sql
+INSERT INTO levels (name, theme, order_index, unlocked_by_default, layout) VALUES
+  ('Your Level Name', 'Jungle', 2, FALSE, '{
+    "background": {
+      "color": "#228B22",
+      "layers": [
+        {"type": "sky", "color": "#87CEEB"},
+        {"type": "trees", "color": "#006400", "parallax": 0.3}
+      ]
+    },
+    "platforms": [
+      {"x": 50, "y": 550, "width": 200, "height": 20, "type": "ground"},
+      {"x": 300, "y": 450, "width": 150, "height": 20, "type": "wood"}
+    ],
+    "hazards": [
+      {"x": 450, "y": 580, "width": 40, "height": 60, "type": "spike"}
+    ],
+    "start": {"x": 100, "y": 450},
+    "goal": {"x": 1150, "y": 350, "width": 60, "height": 80}
+  }');
+```
+
+### Level Layout Format
+
+- **platforms**: Array of platform objects with position, size, and type
+- **hazards**: Array of hazard objects (touching these kills the player)
+- **start**: Player spawn position
+- **goal**: Level completion trigger area
+- **background**: Colors and parallax layers for visual depth
+
+## Deployment
+
+### Deploy to Vercel
+
+1. Push your code to GitHub
+2. Connect your repo to Vercel at [vercel.com](https://vercel.com)
+3. Add your environment variables in Vercel's dashboard
+4. Deploy!
+
+Vercel will automatically build and deploy your game.
+
+## Development Roadmap
+
+- [ ] Add more levels (Jungle, Arctic, Urban)
+- [ ] Implement moving platforms
+- [ ] Add collectible items
+- [ ] Create level editor UI
+- [ ] Add sound effects and music
+- [ ] Implement mobile touch controls
+- [ ] Add character animations using sprite sheets
+
+## Contributing
+
+Contributions are welcome! Feel free to open issues or submit pull requests.
+
+## License
+
+MIT License - feel free to use this project however you'd like!
+
+## Acknowledgments
+
+- Physics powered by [Rapier2D](https://rapier.rs/)
+- Database by [Supabase](https://supabase.com/)
+- Deployed on [Vercel](https://vercel.com/)
