@@ -154,7 +154,7 @@ export class PhysicsBody {
   isGrounded(): boolean {
     const world = this.world.getWorld();
     const pos = this.body.translation();
-    const colliderShape = this.collider.shape() as RAPIER.Cuboid;
+    const colliderShape = this.collider.shape as RAPIER.Cuboid;
     const halfHeight = colliderShape.halfExtents.y;
 
     // Cast a ray downward slightly beyond the bottom of the collider
@@ -163,7 +163,7 @@ export class PhysicsBody {
     const maxToi = halfHeight + 0.1;
 
     const ray = new RAPIER.Ray(rayOrigin, rayDir);
-    const hit = world.castRay(ray, maxToi, true, undefined, undefined, this.body);
+    const hit = world.castRay(ray, maxToi, true, undefined, undefined, this.collider);
 
     return hit !== null;
   }
@@ -200,7 +200,7 @@ export class Platform {
 
   getPosition(): { x: number; y: number; width: number; height: number } {
     const pos = this.body.translation();
-    const shape = this.collider.shape() as RAPIER.Cuboid;
+    const shape = this.collider.shape as RAPIER.Cuboid;
     return {
       x: pos.x,
       y: pos.y,

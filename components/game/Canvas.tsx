@@ -24,10 +24,10 @@ export default function Canvas({
   onLevelFailed,
 }: CanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const animationFrameRef = useRef<number>();
-  const physicsWorldRef = useRef<PhysicsWorld>();
-  const inputManagerRef = useRef<InputManager>();
-  const levelManagerRef = useRef<LevelManager>();
+  const animationFrameRef = useRef<number | undefined>(undefined);
+  const physicsWorldRef = useRef<PhysicsWorld | undefined>(undefined);
+  const inputManagerRef = useRef<InputManager | undefined>(undefined);
+  const levelManagerRef = useRef<LevelManager | undefined>(undefined);
   const lastTimeRef = useRef<number>(0);
 
   useEffect(() => {
