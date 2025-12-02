@@ -8,7 +8,7 @@ export class PhysicsWorld {
   async initialize() {
     if (this.initialized) return;
 
-    await RAPIER.init();
+    await RAPIER.init({});
     const gravity = { x: 0.0, y: 30.0 }; // Positive Y is down
     this.world = new RAPIER.World(gravity);
     this.eventQueue = new RAPIER.EventQueue(true);
@@ -158,16 +158,20 @@ export class PhysicsBody {
   }
 
   isGrounded(): boolean {
-    // Check if the body has very low vertical velocity (on ground)
-    const vel = this.body.linvel();
+    // Check if the collider is in contact with anything below it
+    const world = this.world.getWorld();
+    let isGrounded = false;
 
-    // Also check if we're not falling fast
-    if (Math.abs(vel.y) < 0.5) {
-      // Do a simple position check - if we're near the bottom and not moving much vertically, we're grounded
-      return true;
-    }
+    world.contactPairsWith(this.collider, (otherCollider) => {
+      // Check if there's a contact
+      const vel = this.body.linvel();
+      // If we're not moving down fast, we're probably on something
+      if (vel.y >= -0.1) {
+        isGrounded = true;
+      }
+    });
 
-    return false;
+    return isGrounded;
   }
 
   getRigidBody(): RAPIER.RigidBody {
