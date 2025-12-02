@@ -1,6 +1,6 @@
 // Simple manual physics - no Rapier for now
 export class PhysicsWorld {
-  private gravity = 30.0;
+  private gravity = 800.0; // Increased gravity for faster falls
   private bodies: PhysicsBody[] = [];
   private platforms: Platform[] = [];
 
@@ -148,14 +148,14 @@ export class PhysicsBody {
   moveHorizontal(direction: number, deltaTime: number) {
     const isGrounded = this.isGrounded();
     const controlFactor = isGrounded ? 1.0 : this.physics.airControl;
-    const targetVelX = direction * this.physics.speed * 50; // Scale up for pixel velocity
+    const targetVelX = direction * this.physics.speed * 80; // Scale for pixel velocity
 
     // Smooth acceleration
     const acceleration = (targetVelX - this.velocity.x) * controlFactor * 10;
     this.velocity.x += acceleration * deltaTime;
 
     // Apply damping
-    this.velocity.x *= 0.9;
+    this.velocity.x *= 0.85;
   }
 
   jump(isJumpHeld: boolean, deltaTime: number) {
@@ -164,7 +164,7 @@ export class PhysicsBody {
     // Start jump from ground
     if (isGrounded && isJumpHeld && this.jumpTimeRemaining <= 0) {
       this.jumpTimeRemaining = 0.2;
-      this.velocity.y = -this.physics.jumpForce * 50; // Scale for pixel velocity
+      this.velocity.y = -this.physics.jumpForce * 20; // Reduced scale for better jump height
       this.grounded = false;
     }
 
