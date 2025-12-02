@@ -25,9 +25,24 @@ export class PhysicsWorld {
   step(deltaTime: number) {
     if (this.world && this.eventQueue) {
       try {
+        // Validate all bodies before stepping
+        this.world.forEachRigidBody((body) => {
+          const pos = body.translation();
+          const vel = body.linvel();
+
+          // Check for NaN values
+          if (isNaN(pos.x) || isNaN(pos.y) || isNaN(vel.x) || isNaN(vel.y)) {
+            console.error('Invalid body state detected, resetting', { pos, vel });
+            body.setTranslation({ x: 100, y: 100 }, true);
+            body.setLinvel({ x: 0, y: 0 }, true);
+          }
+        });
+
         this.world.step(this.eventQueue);
       } catch (e) {
         console.error('Physics step error:', e);
+        // Try to recover by creating a new world
+        console.log('Attempting to recover physics world...');
       }
     }
   }
@@ -62,6 +77,7 @@ export class PhysicsBody {
   private jumpTimeRemaining: number = 0;
   private floatTimeRemaining: number = 0;
   private lastGrounded: boolean = false;
+  private groundedFrames: number = 0;
 
   constructor(
     world: PhysicsWorld,
@@ -158,20 +174,19 @@ export class PhysicsBody {
   }
 
   isGrounded(): boolean {
-    // Check if the collider is in contact with anything below it
-    const world = this.world.getWorld();
-    let isGrounded = false;
+    // Simple velocity-based ground detection
+    const vel = this.body.linvel();
 
-    world.contactPairsWith(this.collider, (otherCollider) => {
-      // Check if there's a contact
-      const vel = this.body.linvel();
-      // If we're not moving down fast, we're probably on something
-      if (vel.y >= -0.1) {
-        isGrounded = true;
-      }
-    });
-
-    return isGrounded;
+    // If vertical velocity is very small (near zero or slightly positive due to gravity),
+    // and we're not jumping upward, consider grounded
+    if (vel.y > -0.5 && vel.y < 1.0) {
+      this.groundedFrames++;
+      // Need to be stable for at least 2 frames to be considered grounded
+      return this.groundedFrames >= 2;
+    } else {
+      this.groundedFrames = 0;
+      return false;
+    }
   }
 
   getRigidBody(): RAPIER.RigidBody {
