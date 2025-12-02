@@ -187,6 +187,7 @@ export class PhysicsBody {
 export class Platform {
   private body: RAPIER.RigidBody;
   private collider: RAPIER.Collider;
+  private cachedPosition: { x: number; y: number; width: number; height: number };
 
   constructor(
     world: PhysicsWorld,
@@ -202,16 +203,12 @@ export class Platform {
     // Create collider
     const colliderDesc = RAPIER.ColliderDesc.cuboid(width / 2, height / 2).setFriction(0.8);
     this.collider = world.createCollider(colliderDesc, this.body);
+
+    // Cache position since platforms never move
+    this.cachedPosition = { x, y, width, height };
   }
 
   getPosition(): { x: number; y: number; width: number; height: number } {
-    const pos = this.body.translation();
-    const shape = this.collider.shape as RAPIER.Cuboid;
-    return {
-      x: pos.x,
-      y: pos.y,
-      width: shape.halfExtents.x * 2,
-      height: shape.halfExtents.y * 2,
-    };
+    return this.cachedPosition;
   }
 }
