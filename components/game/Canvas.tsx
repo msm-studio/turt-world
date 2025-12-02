@@ -120,6 +120,9 @@ export default function Canvas({
       width={width}
       height={height}
       className="border-4 border-gray-800 rounded-lg shadow-lg"
+      tabIndex={0}
+      onClick={(e) => e.currentTarget.focus()}
+      style={{ outline: 'none' }}
     />
   );
 }

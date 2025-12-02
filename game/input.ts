@@ -12,6 +12,13 @@ export class InputManager {
   }
 
   private handleKeyDown = (e: KeyboardEvent) => {
+    // Prevent default browser behavior for arrow keys and space
+    if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' '].includes(e.key)) {
+      e.preventDefault();
+    }
+
+    console.log('Key down:', e.key); // Debug
+
     if (!this.keys.get(e.key)) {
       this.keyJustPressed.set(e.key, true);
     }
@@ -19,6 +26,11 @@ export class InputManager {
   };
 
   private handleKeyUp = (e: KeyboardEvent) => {
+    // Prevent default browser behavior
+    if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' '].includes(e.key)) {
+      e.preventDefault();
+    }
+
     this.keys.set(e.key, false);
     this.keyJustPressed.set(e.key, false);
   };
