@@ -25,24 +25,9 @@ export class PhysicsWorld {
   step(deltaTime: number) {
     if (this.world && this.eventQueue) {
       try {
-        // Validate all bodies before stepping
-        this.world.forEachRigidBody((body) => {
-          const pos = body.translation();
-          const vel = body.linvel();
-
-          // Check for NaN values
-          if (isNaN(pos.x) || isNaN(pos.y) || isNaN(vel.x) || isNaN(vel.y)) {
-            console.error('Invalid body state detected, resetting', { pos, vel });
-            body.setTranslation({ x: 100, y: 100 }, true);
-            body.setLinvel({ x: 0, y: 0 }, true);
-          }
-        });
-
         this.world.step(this.eventQueue);
       } catch (e) {
         console.error('Physics step error:', e);
-        // Try to recover by creating a new world
-        console.log('Attempting to recover physics world...');
       }
     }
   }
