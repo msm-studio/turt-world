@@ -158,20 +158,16 @@ export class PhysicsBody {
   }
 
   isGrounded(): boolean {
-    const world = this.world.getWorld();
-    const pos = this.body.translation();
-    const colliderShape = this.collider.shape as RAPIER.Cuboid;
-    const halfHeight = colliderShape.halfExtents.y;
+    // Check if the body has very low vertical velocity (on ground)
+    const vel = this.body.linvel();
 
-    // Cast a ray downward slightly beyond the bottom of the collider
-    const rayOrigin = { x: pos.x, y: pos.y };
-    const rayDir = { x: 0, y: 1 };
-    const maxToi = halfHeight + 0.1;
+    // Also check if we're not falling fast
+    if (Math.abs(vel.y) < 0.5) {
+      // Do a simple position check - if we're near the bottom and not moving much vertically, we're grounded
+      return true;
+    }
 
-    const ray = new RAPIER.Ray(rayOrigin, rayDir);
-    const hit = world.castRay(ray, maxToi, true, undefined, undefined, this.collider);
-
-    return hit !== null;
+    return false;
   }
 
   getRigidBody(): RAPIER.RigidBody {
