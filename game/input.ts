@@ -17,8 +17,6 @@ export class InputManager {
       e.preventDefault();
     }
 
-    console.log('Key down:', e.key); // Debug
-
     if (!this.keys.get(e.key)) {
       this.keyJustPressed.set(e.key, true);
     }

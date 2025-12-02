@@ -29,6 +29,7 @@ export default function Canvas({
   const inputManagerRef = useRef<InputManager | undefined>(undefined);
   const levelManagerRef = useRef<LevelManager | undefined>(undefined);
   const lastTimeRef = useRef<number>(0);
+  const isRespawningRef = useRef<boolean>(false);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -84,11 +85,13 @@ export default function Canvas({
           return;
         }
 
-        if (currentLevel.isLevelFailed()) {
+        if (currentLevel.isLevelFailed() && !isRespawningRef.current) {
+          isRespawningRef.current = true;
           onLevelFailed();
           // Respawn after a short delay
           setTimeout(() => {
             currentLevel.respawn(character);
+            isRespawningRef.current = false;
           }, 500);
         }
       }
