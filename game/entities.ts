@@ -72,7 +72,8 @@ export class Player {
       pos.y - this.height / 2,
       this.width,
       this.height,
-      this.facingRight
+      this.facingRight,
+      frame.isBlinking
     );
   }
 
