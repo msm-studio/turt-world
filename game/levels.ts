@@ -94,19 +94,89 @@ export class GameLevel {
   }
 
   render(ctx: CanvasRenderingContext2D, canvasWidth: number, canvasHeight: number) {
-    // Draw background
+    // Draw base background
     ctx.fillStyle = this.levelData.layout.background.color;
     ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 
-    // Draw background layers with parallax
-    for (const layer of this.levelData.layout.background.layers) {
-      if (layer.type === 'sky') {
-        const gradient = ctx.createLinearGradient(0, 0, 0, canvasHeight);
-        gradient.addColorStop(0, layer.color);
-        gradient.addColorStop(1, this.levelData.layout.background.color);
-        ctx.fillStyle = gradient;
-        ctx.fillRect(0, 0, canvasWidth, canvasHeight / 2);
+    // Enhanced sky gradient for desert
+    const skyGradient = ctx.createLinearGradient(0, 0, 0, canvasHeight * 0.6);
+    skyGradient.addColorStop(0, '#FDB45C'); // Orange-yellow at top
+    skyGradient.addColorStop(0.4, '#FFA07A'); // Light coral
+    skyGradient.addColorStop(1, '#E8C3A0'); // Tan at horizon
+    ctx.fillStyle = skyGradient;
+    ctx.fillRect(0, 0, canvasWidth, canvasHeight * 0.6);
+
+    // Sun
+    const sunGradient = ctx.createRadialGradient(
+      canvasWidth * 0.8, canvasHeight * 0.15, 0,
+      canvasWidth * 0.8, canvasHeight * 0.15, 50
+    );
+    sunGradient.addColorStop(0, 'rgba(255, 255, 200, 0.9)');
+    sunGradient.addColorStop(0.5, 'rgba(255, 200, 100, 0.6)');
+    sunGradient.addColorStop(1, 'rgba(255, 150, 50, 0)');
+    ctx.fillStyle = sunGradient;
+    ctx.beginPath();
+    ctx.arc(canvasWidth * 0.8, canvasHeight * 0.15, 50, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Parallax Layer 1: Distant mountains (far back)
+    ctx.fillStyle = 'rgba(139, 90, 43, 0.3)';
+    ctx.globalAlpha = 0.4;
+    ctx.beginPath();
+    ctx.moveTo(0, canvasHeight * 0.5);
+    for (let i = 0; i <= 6; i++) {
+      const x = (canvasWidth / 6) * i;
+      const peakHeight = canvasHeight * (0.35 + Math.sin(i * 1.2) * 0.1);
+      ctx.lineTo(x, peakHeight);
+    }
+    ctx.lineTo(canvasWidth, canvasHeight * 0.5);
+    ctx.closePath();
+    ctx.fill();
+    ctx.globalAlpha = 1.0;
+
+    // Parallax Layer 2: Mid-distance dunes
+    const duneGradient = ctx.createLinearGradient(0, canvasHeight * 0.4, 0, canvasHeight * 0.65);
+    duneGradient.addColorStop(0, '#D2A774');
+    duneGradient.addColorStop(1, '#C19A6B');
+    ctx.fillStyle = duneGradient;
+    ctx.globalAlpha = 0.6;
+    ctx.beginPath();
+    ctx.moveTo(0, canvasHeight * 0.65);
+    for (let i = 0; i <= 8; i++) {
+      const x = (canvasWidth / 8) * i;
+      const y = canvasHeight * (0.55 + Math.sin(i * 0.8 + 1) * 0.08);
+      if (i === 0) {
+        ctx.moveTo(x, y);
+      } else {
+        ctx.quadraticCurveTo(x - canvasWidth / 16, y, x, y);
       }
+    }
+    ctx.lineTo(canvasWidth, canvasHeight * 0.65);
+    ctx.closePath();
+    ctx.fill();
+    ctx.globalAlpha = 1.0;
+
+    // Parallax Layer 3: Foreground cacti (simplified)
+    ctx.fillStyle = '#556B2F';
+    ctx.globalAlpha = 0.3;
+    // Left cactus silhouette
+    ctx.fillRect(canvasWidth * 0.05, canvasHeight * 0.45, 15, 80);
+    ctx.fillRect(canvasWidth * 0.05 - 8, canvasHeight * 0.55, 10, 25);
+    // Right cactus silhouette
+    ctx.fillRect(canvasWidth * 0.92, canvasHeight * 0.5, 12, 60);
+    ctx.fillRect(canvasWidth * 0.92 + 12, canvasHeight * 0.6, 8, 20);
+    ctx.globalAlpha = 1.0;
+
+    // Floating dust particles
+    const time = Date.now() / 1000;
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+    for (let i = 0; i < 15; i++) {
+      const x = ((i * 73 + time * 20) % canvasWidth);
+      const y = ((i * 97) % (canvasHeight * 0.7)) + Math.sin(time + i) * 10;
+      const size = 1 + (i % 3);
+      ctx.beginPath();
+      ctx.arc(x, y, size, 0, Math.PI * 2);
+      ctx.fill();
     }
 
     // Draw platforms

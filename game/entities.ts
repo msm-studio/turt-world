@@ -106,25 +106,59 @@ export class Hazard {
   ) {}
 
   render(ctx: CanvasRenderingContext2D) {
-    // Draw hazards based on type
     ctx.save();
 
     if (this.type === 'cactus') {
-      // Draw cactus
-      ctx.fillStyle = '#2D5016';
+      // Cactus body with gradient
+      const cactusGradient = ctx.createLinearGradient(this.x, this.y, this.x + this.width, this.y);
+      cactusGradient.addColorStop(0, '#1F3A12');
+      cactusGradient.addColorStop(0.5, '#2D5016');
+      cactusGradient.addColorStop(1, '#1F3A12');
+      ctx.fillStyle = cactusGradient;
       ctx.fillRect(this.x, this.y, this.width, this.height);
 
-      // Add spikes
+      // Outline
+      ctx.strokeStyle = '#1a3010';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(this.x, this.y, this.width, this.height);
+
+      // Enhanced spikes
       ctx.fillStyle = '#1a3010';
-      for (let i = 0; i < 3; i++) {
-        const spikeY = this.y + (this.height / 4) * (i + 0.5);
-        ctx.fillRect(this.x - 5, spikeY, 5, 3);
-        ctx.fillRect(this.x + this.width, spikeY, 5, 3);
+      for (let i = 0; i < 4; i++) {
+        const spikeY = this.y + (this.height / 5) * (i + 0.5);
+        // Left spikes
+        ctx.beginPath();
+        ctx.moveTo(this.x, spikeY);
+        ctx.lineTo(this.x - 6, spikeY - 2);
+        ctx.lineTo(this.x - 4, spikeY + 4);
+        ctx.closePath();
+        ctx.fill();
+        // Right spikes
+        ctx.beginPath();
+        ctx.moveTo(this.x + this.width, spikeY);
+        ctx.lineTo(this.x + this.width + 6, spikeY - 2);
+        ctx.lineTo(this.x + this.width + 4, spikeY + 4);
+        ctx.closePath();
+        ctx.fill();
       }
+
+      // Flower on top
+      ctx.fillStyle = '#FF69B4';
+      ctx.beginPath();
+      ctx.arc(this.x + this.width / 2, this.y - 2, 4, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#FFD700';
+      ctx.beginPath();
+      ctx.arc(this.x + this.width / 2, this.y - 2, 2, 0, Math.PI * 2);
+      ctx.fill();
     } else {
-      // Generic hazard
-      ctx.fillStyle = '#FF0000';
+      // Generic hazard with pulsing effect
+      const pulse = Math.sin(Date.now() / 200) * 0.2 + 0.8;
+      ctx.fillStyle = `rgba(255, 0, 0, ${pulse})`;
       ctx.fillRect(this.x, this.y, this.width, this.height);
+      ctx.strokeStyle = '#8B0000';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(this.x, this.y, this.width, this.height);
     }
 
     ctx.restore();
@@ -151,15 +185,35 @@ export class Goal {
   ) {}
 
   render(ctx: CanvasRenderingContext2D) {
-    // Draw goal as a flag/portal
     ctx.save();
 
-    // Flag pole
-    ctx.fillStyle = '#8B4513';
+    const time = Date.now() / 1000;
+
+    // Pulsing scale effect
+    const scale = 0.95 + Math.sin(time * 2) * 0.05;
+    ctx.translate(this.x + this.width / 2, this.y + this.height / 2);
+    ctx.scale(scale, scale);
+    ctx.translate(-(this.x + this.width / 2), -(this.y + this.height / 2));
+
+    // Flag pole with gradient
+    const poleGradient = ctx.createLinearGradient(
+      this.x + this.width / 2 - 3, this.y,
+      this.x + this.width / 2 + 3, this.y
+    );
+    poleGradient.addColorStop(0, '#6B3410');
+    poleGradient.addColorStop(0.5, '#8B4513');
+    poleGradient.addColorStop(1, '#6B3410');
+    ctx.fillStyle = poleGradient;
     ctx.fillRect(this.x + this.width / 2 - 3, this.y, 6, this.height);
 
-    // Flag
-    ctx.fillStyle = '#FFD700';
+    // Flag with gradient
+    const flagGradient = ctx.createLinearGradient(
+      this.x + this.width / 2, this.y + 5,
+      this.x + this.width / 2 + 30, this.y + 15
+    );
+    flagGradient.addColorStop(0, '#FFD700');
+    flagGradient.addColorStop(1, '#FFA500');
+    ctx.fillStyle = flagGradient;
     ctx.beginPath();
     ctx.moveTo(this.x + this.width / 2, this.y + 5);
     ctx.lineTo(this.x + this.width / 2 + 30, this.y + 15);
@@ -167,12 +221,33 @@ export class Goal {
     ctx.closePath();
     ctx.fill();
 
-    // Sparkle effect
-    const time = Date.now() / 1000;
-    const sparkle = Math.sin(time * 3) * 0.3 + 0.7;
-    ctx.globalAlpha = sparkle;
+    // Flag outline
+    ctx.strokeStyle = '#DAA520';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    // Rotating sparkle particles
+    const sparkleCount = 6;
+    for (let i = 0; i < sparkleCount; i++) {
+      const angle = (time * 2 + (i / sparkleCount) * Math.PI * 2);
+      const radius = 25 + Math.sin(time * 3 + i) * 5;
+      const sparkleX = this.x + this.width / 2 + Math.cos(angle) * radius;
+      const sparkleY = this.y + this.height / 2 + Math.sin(angle) * radius;
+
+      const sparkleAlpha = Math.sin(time * 4 + i) * 0.3 + 0.7;
+      ctx.fillStyle = `rgba(255, 255, 0, ${sparkleAlpha})`;
+      ctx.beginPath();
+      ctx.arc(sparkleX, sparkleY, 2, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // Glow effect
+    const glowAlpha = Math.sin(time * 3) * 0.3 + 0.5;
+    ctx.shadowColor = '#FFD700';
+    ctx.shadowBlur = 15;
+    ctx.globalAlpha = glowAlpha;
     ctx.strokeStyle = '#FFF700';
-    ctx.lineWidth = 2;
+    ctx.lineWidth = 3;
     ctx.strokeRect(this.x, this.y, this.width, this.height);
 
     ctx.restore();
@@ -207,32 +282,70 @@ export class LevelPlatform {
   render(ctx: CanvasRenderingContext2D) {
     ctx.save();
 
-    // Platform colors based on type
+    const pos = this.platform.getPosition();
+    const x = pos.x - pos.width / 2;
+    const y = pos.y - pos.height / 2;
+
+    // Platform gradient based on type
+    let gradient;
     if (this.type === 'ground') {
-      ctx.fillStyle = '#8B7355';
+      gradient = ctx.createLinearGradient(x, y, x + pos.width, y);
+      gradient.addColorStop(0, '#7A6347');
+      gradient.addColorStop(0.5, '#8B7355');
+      gradient.addColorStop(1, '#7A6347');
     } else if (this.type === 'sand') {
-      ctx.fillStyle = '#DEB887';
+      gradient = ctx.createLinearGradient(x, y, x + pos.width, y);
+      gradient.addColorStop(0, '#D4A574');
+      gradient.addColorStop(0.5, '#DEB887');
+      gradient.addColorStop(1, '#D4A574');
     } else {
-      ctx.fillStyle = '#A0A0A0';
+      gradient = ctx.createLinearGradient(x, y, x + pos.width, y);
+      gradient.addColorStop(0, '#909090');
+      gradient.addColorStop(0.5, '#A0A0A0');
+      gradient.addColorStop(1, '#909090');
     }
 
-    const pos = this.platform.getPosition();
-    ctx.fillRect(
-      pos.x - pos.width / 2,
-      pos.y - pos.height / 2,
-      pos.width,
-      pos.height
-    );
+    ctx.fillStyle = gradient;
+    ctx.fillRect(x, y, pos.width, pos.height);
 
-    // Add texture/detail
-    ctx.strokeStyle = 'rgba(0, 0, 0, 0.2)';
+    // Top highlight
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+    ctx.fillRect(x, y, pos.width, 2);
+
+    // Bottom shadow
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+    ctx.fillRect(x, y + pos.height - 2, pos.width, 2);
+
+    // Texture dots for sand
+    if (this.type === 'sand') {
+      ctx.fillStyle = 'rgba(200, 160, 100, 0.4)';
+      for (let i = 0; i < pos.width / 10; i++) {
+        for (let j = 0; j < pos.height / 10; j++) {
+          if (Math.random() > 0.7) {
+            ctx.fillRect(x + i * 10 + Math.random() * 5, y + j * 10 + Math.random() * 5, 2, 2);
+          }
+        }
+      }
+    }
+
+    // Grass tufts for ground platforms
+    if (this.type === 'ground') {
+      ctx.fillStyle = '#4CAF50';
+      for (let i = 0; i < pos.width / 20; i++) {
+        const turfX = x + i * 20 + Math.random() * 10;
+        ctx.beginPath();
+        ctx.moveTo(turfX, y);
+        ctx.lineTo(turfX - 2, y - 5);
+        ctx.lineTo(turfX + 2, y - 5);
+        ctx.closePath();
+        ctx.fill();
+      }
+    }
+
+    // Border
+    ctx.strokeStyle = 'rgba(0, 0, 0, 0.3)';
     ctx.lineWidth = 1;
-    ctx.strokeRect(
-      pos.x - pos.width / 2,
-      pos.y - pos.height / 2,
-      pos.width,
-      pos.height
-    );
+    ctx.strokeRect(x, y, pos.width, pos.height);
 
     ctx.restore();
   }
