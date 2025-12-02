@@ -2,6 +2,7 @@ import RAPIER from '@dimforge/rapier2d-compat';
 
 export class PhysicsWorld {
   private world: RAPIER.World | null = null;
+  private eventQueue: RAPIER.EventQueue | null = null;
   private initialized = false;
 
   async initialize() {
@@ -10,6 +11,7 @@ export class PhysicsWorld {
     await RAPIER.init();
     const gravity = { x: 0.0, y: 30.0 }; // Positive Y is down
     this.world = new RAPIER.World(gravity);
+    this.eventQueue = new RAPIER.EventQueue(true);
     this.initialized = true;
   }
 
@@ -21,8 +23,12 @@ export class PhysicsWorld {
   }
 
   step(deltaTime: number) {
-    if (this.world) {
-      this.world.step();
+    if (this.world && this.eventQueue) {
+      try {
+        this.world.step(this.eventQueue);
+      } catch (e) {
+        console.error('Physics step error:', e);
+      }
     }
   }
 
