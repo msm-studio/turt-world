@@ -40,6 +40,9 @@ export class Player {
   }
 
   update(input: InputManager, deltaTime: number) {
+    // Update physics cache before any operations
+    this.physicsBody.updateCache();
+
     // Handle horizontal movement
     let moveDirection = 0;
     if (input.left) moveDirection -= 1;

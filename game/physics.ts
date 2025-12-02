@@ -63,6 +63,8 @@ export class PhysicsBody {
   private floatTimeRemaining: number = 0;
   private lastGrounded: boolean = false;
   private groundedFrames: number = 0;
+  private cachedPosition: { x: number; y: number } = { x: 0, y: 0 };
+  private cachedVelocity: { x: number; y: number } = { x: 0, y: 0 };
 
   constructor(
     world: PhysicsWorld,
@@ -92,14 +94,20 @@ export class PhysicsBody {
     this.collider = world.createCollider(colliderDesc, this.body);
   }
 
-  getPosition(): { x: number; y: number } {
+  updateCache() {
+    // Cache position and velocity to avoid querying during physics step
     const pos = this.body.translation();
-    return { x: pos.x, y: pos.y };
+    const vel = this.body.linvel();
+    this.cachedPosition = { x: pos.x, y: pos.y };
+    this.cachedVelocity = { x: vel.x, y: vel.y };
+  }
+
+  getPosition(): { x: number; y: number } {
+    return this.cachedPosition;
   }
 
   getVelocity(): { x: number; y: number } {
-    const vel = this.body.linvel();
-    return { x: vel.x, y: vel.y };
+    return this.cachedVelocity;
   }
 
   setVelocity(x: number, y: number) {
@@ -159,8 +167,8 @@ export class PhysicsBody {
   }
 
   isGrounded(): boolean {
-    // Simple velocity-based ground detection
-    const vel = this.body.linvel();
+    // Simple velocity-based ground detection using cached velocity
+    const vel = this.cachedVelocity;
 
     // If vertical velocity is very small (near zero or slightly positive due to gravity),
     // and we're not jumping upward, consider grounded
