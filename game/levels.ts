@@ -58,6 +58,13 @@ export class GameLevel {
     this.startTime = Date.now();
   }
 
+  cachePhysicsState() {
+    // Cache physics state for this frame (called after physics step)
+    if (this.player) {
+      this.player.cachePhysicsState();
+    }
+  }
+
   update(deltaTime: number, input: any) {
     if (!this.player || this.isComplete || this.isFailed) return;
 

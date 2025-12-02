@@ -39,10 +39,12 @@ export class Player {
     this.animation = new Animation(characterData.name);
   }
 
-  update(input: InputManager, deltaTime: number) {
-    // Update physics cache before any operations
+  cachePhysicsState() {
+    // Cache physics state (called after physics step)
     this.physicsBody.updateCache();
+  }
 
+  update(input: InputManager, deltaTime: number) {
     // Handle horizontal movement
     let moveDirection = 0;
     if (input.left) moveDirection -= 1;

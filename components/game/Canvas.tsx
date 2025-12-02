@@ -70,13 +70,16 @@ export default function Canvas({
       const deltaTime = Math.min((currentTime - lastTimeRef.current) / 1000, 0.1);
       lastTimeRef.current = currentTime;
 
-      // Update game logic (BEFORE physics step to avoid aliasing)
       const currentLevel = levelManagerRef.current?.getCurrentLevel();
       if (currentLevel && inputManagerRef.current) {
-        currentLevel.update(deltaTime, inputManagerRef.current);
-
-        // Now step physics AFTER we've cached and made decisions
+        // Step physics first
         physicsWorldRef.current?.step(deltaTime);
+
+        // Now cache physics state (world is unlocked after step)
+        currentLevel.cachePhysicsState();
+
+        // Update game logic using cached state
+        currentLevel.update(deltaTime, inputManagerRef.current);
 
         // Check win/lose conditions
         if (currentLevel.isLevelComplete()) {
