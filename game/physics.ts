@@ -11,6 +11,7 @@ export class PhysicsWorld {
   step(deltaTime: number) {
     // Apply gravity and update all bodies
     for (const body of this.bodies) {
+      body.resetGroundedFlag(); // Reset at start of physics update
       body.applyGravity(this.gravity, deltaTime);
       body.integrateVelocity(deltaTime);
 
@@ -164,7 +165,7 @@ export class PhysicsBody {
     // Start jump from ground
     if (isGrounded && isJumpHeld && this.jumpTimeRemaining <= 0) {
       this.jumpTimeRemaining = 0.2;
-      this.velocity.y = -this.physics.jumpForce * 20; // Reduced scale for better jump height
+      this.velocity.y = -this.physics.jumpForce * 30; // Medium jump height
       this.grounded = false;
     }
 
@@ -198,9 +199,12 @@ export class PhysicsBody {
   }
 
   isGrounded(): boolean {
-    const wasGrounded = this.grounded;
-    this.grounded = false; // Reset, will be set by collision detection
-    return wasGrounded;
+    return this.grounded;
+  }
+
+  resetGroundedFlag() {
+    // Called at start of physics update
+    this.grounded = false;
   }
 
   destroy() {
