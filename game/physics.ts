@@ -165,7 +165,7 @@ export class PhysicsBody {
     // Start jump from ground
     if (isGrounded && isJumpHeld && this.jumpTimeRemaining <= 0) {
       this.jumpTimeRemaining = 0.2;
-      this.velocity.y = -this.physics.jumpForce * 30; // Medium jump height
+      this.velocity.y = -this.physics.jumpForce * 40; // Higher jump for platform navigation
       this.grounded = false;
     }
 
