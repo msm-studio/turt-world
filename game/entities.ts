@@ -39,11 +39,6 @@ export class Player {
     this.animation = new Animation(characterData.name);
   }
 
-  cachePhysicsState() {
-    // Cache physics state (called after physics step)
-    this.physicsBody.updateCache();
-  }
-
   update(input: InputManager, deltaTime: number) {
     // Handle horizontal movement
     let moveDirection = 0;

@@ -72,14 +72,11 @@ export default function Canvas({
 
       const currentLevel = levelManagerRef.current?.getCurrentLevel();
       if (currentLevel && inputManagerRef.current) {
-        // Step physics first
-        physicsWorldRef.current?.step(deltaTime);
-
-        // Now cache physics state (world is unlocked after step)
-        currentLevel.cachePhysicsState();
-
-        // Update game logic using cached state
+        // Update game logic
         currentLevel.update(deltaTime, inputManagerRef.current);
+
+        // Step physics
+        physicsWorldRef.current?.step(deltaTime);
 
         // Check win/lose conditions
         if (currentLevel.isLevelComplete()) {
