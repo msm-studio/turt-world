@@ -276,10 +276,10 @@ function drawPig(
   // Stubby little legs
   ctx.fillStyle = '#FFB6C1';
   ctx.beginPath();
-  ctx.ellipse(x + width*0.65, y + height*0.88, 6, 10, 0, 0, Math.PI * 2);
+  ctx.ellipse(x + width*0.65, centerY + height*0.38, 6, 10, 0, 0, Math.PI * 2);
   ctx.fill();
   ctx.beginPath();
-  ctx.ellipse(x + width*0.35, y + height*0.88, 6, 10, 0, 0, Math.PI * 2);
+  ctx.ellipse(x + width*0.35, centerY + height*0.38, 6, 10, 0, 0, Math.PI * 2);
   ctx.fill();
 
   // Curly tail
