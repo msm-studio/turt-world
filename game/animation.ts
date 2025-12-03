@@ -134,101 +134,77 @@ function drawTurtle(
   height: number,
   isBlinking: boolean
 ) {
-  // PROFILE VIEW - facing RIGHT, cute style
+  // CHIBI STYLE - big head, tiny body, huge eyes
   const centerX = x + width / 2;
   const centerY = y + height / 2;
 
-  // Shell (rounded dome)
-  const shellGradient = ctx.createRadialGradient(
-    centerX, centerY - height * 0.05, 0,
-    centerX, centerY - height * 0.05, width * 0.45
-  );
+  // Shell (main body - large and round)
+  const shellGradient = ctx.createRadialGradient(centerX, centerY + height*0.05, 0, centerX, centerY + height*0.05, width*0.5);
   shellGradient.addColorStop(0, '#4DAF4D');
-  shellGradient.addColorStop(1, '#1a5c1a');
+  shellGradient.addColorStop(1, '#2D7B2D');
 
   ctx.fillStyle = shellGradient;
   ctx.beginPath();
-  ctx.ellipse(centerX, centerY - height * 0.05, width * 0.42, height * 0.42, 0, 0, Math.PI * 2);
+  ctx.arc(centerX, centerY + height*0.05, width*0.45, 0, Math.PI * 2);
   ctx.fill();
 
-  // Shell hexagon pattern
-  ctx.strokeStyle = '#2D7B2D';
-  ctx.lineWidth = 1.5;
+  // Shell pattern
+  ctx.strokeStyle = '#1a5c1a';
+  ctx.lineWidth = 2;
   for (let i = 0; i < 3; i++) {
     ctx.beginPath();
-    ctx.arc(centerX, centerY - height * 0.05, 6 + i * 4, 0, Math.PI * 2);
+    ctx.arc(centerX, centerY + height*0.05, 8 + i*6, 0, Math.PI * 2);
     ctx.stroke();
   }
 
-  // Cute round head (RIGHT side)
-  const headGradient = ctx.createRadialGradient(
-    x + width * 0.82, centerY - height * 0.2, 0,
-    x + width * 0.82, centerY - height * 0.2, 11
-  );
+  // HUGE head (chibi style - head is disproportionately large)
+  const headGradient = ctx.createRadialGradient(x + width*0.8, centerY - height*0.25, 0, x + width*0.8, centerY - height*0.25, 18);
   headGradient.addColorStop(0, '#4DAF4D');
-  headGradient.addColorStop(1, '#2D7B2D');
+  headGradient.addColorStop(1, '#3D9B3D');
 
   ctx.fillStyle = headGradient;
   ctx.beginPath();
-  ctx.arc(x + width * 0.82, centerY - height * 0.2, 10, 0, Math.PI * 2);
+  ctx.arc(x + width*0.8, centerY - height*0.25, 16, 0, Math.PI * 2);
   ctx.fill();
 
-  // Neck connecting to shell
-  ctx.fillStyle = '#3D9B3D';
-  ctx.beginPath();
-  ctx.ellipse(x + width * 0.7, centerY - height * 0.12, 7, 8, -0.2, 0, Math.PI * 2);
-  ctx.fill();
-
-  // Big cute eye
-  const eyeX = x + width * 0.84;
-  const eyeY = centerY - height * 0.22;
+  // HUGE sparkly eyes
+  const eyeX = x + width*0.82;
+  const eyeY = centerY - height*0.27;
 
   if (!isBlinking) {
-    // White of eye
-    ctx.fillStyle = '#FFFFFF';
-    ctx.beginPath();
-    ctx.arc(eyeX, eyeY, 3.5, 0, Math.PI * 2);
-    ctx.fill();
-    // Pupil
     ctx.fillStyle = '#000000';
     ctx.beginPath();
-    ctx.arc(eyeX, eyeY, 2, 0, Math.PI * 2);
+    ctx.arc(eyeX, eyeY, 5, 0, Math.PI * 2);
     ctx.fill();
-    // Highlight
+
+    // Big white highlight
     ctx.fillStyle = '#FFFFFF';
     ctx.beginPath();
-    ctx.arc(eyeX + 0.5, eyeY - 0.5, 1, 0, Math.PI * 2);
+    ctx.arc(eyeX + 2, eyeY - 2, 2.5, 0, Math.PI * 2);
     ctx.fill();
   } else {
     ctx.strokeStyle = '#000000';
     ctx.lineWidth = 2;
     ctx.beginPath();
-    ctx.moveTo(eyeX - 3, eyeY);
-    ctx.lineTo(eyeX + 3, eyeY);
+    ctx.moveTo(eyeX - 4, eyeY);
+    ctx.lineTo(eyeX + 4, eyeY);
     ctx.stroke();
   }
 
-  // Little smile
+  // Tiny smile
   ctx.strokeStyle = '#2D7B2D';
-  ctx.lineWidth = 1;
+  ctx.lineWidth = 1.5;
   ctx.beginPath();
-  ctx.arc(x + width * 0.82, centerY - height * 0.16, 3, 0.3, Math.PI - 0.3);
+  ctx.arc(x + width*0.8, centerY - height*0.2, 5, 0.2, Math.PI - 0.2);
   ctx.stroke();
 
-  // Stubby legs (2 visible)
-  ctx.fillStyle = '#2D7B2D';
-  // Front leg (right side)
+  // Stubby little legs
+  ctx.fillStyle = '#3D9B3D';
   ctx.beginPath();
-  ctx.ellipse(x + width * 0.7, y + height * 0.75, 5, 9, 0.2, 0, Math.PI * 2);
+  ctx.arc(x + width*0.7, y + height*0.85, 6, 0, Math.PI * 2);
   ctx.fill();
-  // Back leg
   ctx.beginPath();
-  ctx.ellipse(x + width * 0.35, y + height * 0.78, 5, 8, -0.2, 0, Math.PI * 2);
-  ctx.fill();
-
-  // Tiny tail at back (left side)
-  ctx.beginPath();
-  ctx.ellipse(x + width * 0.12, centerY + height * 0.05, 3, 4, 0, 0, Math.PI * 2);
+  ctx.arc(x + width*0.35, y + height*0.88, 6, 0, Math.PI * 2);
   ctx.fill();
 }
 
@@ -240,94 +216,77 @@ function drawPig(
   height: number,
   isBlinking: boolean
 ) {
-  // PROFILE VIEW - facing RIGHT, cute chubby pig
+  // CHIBI STYLE - round body, huge snout, tiny legs
   const centerX = x + width / 2;
   const centerY = y + height / 2;
 
-  // Round chubby body
-  const bodyGradient = ctx.createRadialGradient(
-    centerX - width * 0.05, centerY, 0,
-    centerX - width * 0.05, centerY, width * 0.48
-  );
+  // Round body (HUGE)
+  const bodyGradient = ctx.createRadialGradient(centerX, centerY + height*0.05, 0, centerX, centerY + height*0.05, width*0.5);
   bodyGradient.addColorStop(0, '#FFB6C1');
   bodyGradient.addColorStop(1, '#FF9BAE');
-
   ctx.fillStyle = bodyGradient;
   ctx.beginPath();
-  ctx.ellipse(centerX - width * 0.05, centerY, width * 0.45, height * 0.42, 0, 0, Math.PI * 2);
+  ctx.arc(centerX, centerY + height*0.05, width*0.45, 0, Math.PI * 2);
   ctx.fill();
 
-  // Cute head (RIGHT side)
+  // HUGE snout sticking out
+  ctx.fillStyle = '#FFB6C1';
   ctx.beginPath();
-  ctx.arc(x + width * 0.78, centerY - height * 0.15, 12, 0, Math.PI * 2);
+  ctx.ellipse(x + width*0.85, centerY - height*0.05, 18, 14, 0, 0, Math.PI * 2);
   ctx.fill();
 
-  // Floppy ear
-  ctx.fillStyle = '#FF9BAE';
+  // Nostrils
+  ctx.fillStyle = '#D4909E';
   ctx.beginPath();
-  ctx.ellipse(x + width * 0.75, centerY - height * 0.26, 7, 11, -0.3, 0, Math.PI * 2);
-  ctx.fill();
-
-  // Adorable snout
-  const snoutGradient = ctx.createRadialGradient(
-    x + width * 0.9, centerY - height * 0.12, 0,
-    x + width * 0.9, centerY - height * 0.12, 10
-  );
-  snoutGradient.addColorStop(0, '#FFE4E1');
-  snoutGradient.addColorStop(1, '#FFB6C1');
-
-  ctx.fillStyle = snoutGradient;
-  ctx.beginPath();
-  ctx.ellipse(x + width * 0.9, centerY - height * 0.12, 9, 8, 0, 0, Math.PI * 2);
-  ctx.fill();
-
-  // Two nostrils
-  ctx.fillStyle = '#FF69B4';
-  ctx.beginPath();
-  ctx.ellipse(x + width * 0.88, centerY - height * 0.14, 1.5, 2, 0, 0, Math.PI * 2);
+  ctx.ellipse(x + width*0.82, centerY - height*0.07, 3, 4, 0, 0, Math.PI * 2);
   ctx.fill();
   ctx.beginPath();
-  ctx.ellipse(x + width * 0.92, centerY - height * 0.10, 1.5, 2, 0, 0, Math.PI * 2);
+  ctx.ellipse(x + width*0.82, centerY - height*0.02, 3, 4, 0, 0, Math.PI * 2);
   ctx.fill();
 
-  // Big cute eye
-  const eyeX = x + width * 0.8;
-  const eyeY = centerY - height * 0.2;
+  // HUGE eyes
+  const eyeX = x + width*0.62;
+  const eyeY = centerY - height*0.15;
 
   if (!isBlinking) {
     ctx.fillStyle = '#000000';
     ctx.beginPath();
-    ctx.arc(eyeX, eyeY, 3, 0, Math.PI * 2);
+    ctx.arc(eyeX, eyeY, 6, 0, Math.PI * 2);
     ctx.fill();
+
     ctx.fillStyle = '#FFFFFF';
     ctx.beginPath();
-    ctx.arc(eyeX + 0.5, eyeY - 0.5, 1.2, 0, Math.PI * 2);
+    ctx.arc(eyeX + 2, eyeY - 2, 2.5, 0, Math.PI * 2);
     ctx.fill();
   } else {
     ctx.strokeStyle = '#000000';
     ctx.lineWidth = 2;
     ctx.beginPath();
-    ctx.moveTo(eyeX - 3, eyeY);
-    ctx.lineTo(eyeX + 3, eyeY);
+    ctx.moveTo(eyeX - 5, eyeY);
+    ctx.lineTo(eyeX + 5, eyeY);
     ctx.stroke();
   }
 
-  // Stubby legs (2 visible)
+  // Tiny floppy ear
   ctx.fillStyle = '#FF9BAE';
-  // Front leg
   ctx.beginPath();
-  ctx.ellipse(x + width * 0.65, y + height * 0.82, 5, 9, 0, 0, Math.PI * 2);
-  ctx.fill();
-  // Back leg
-  ctx.beginPath();
-  ctx.ellipse(x + width * 0.35, y + height * 0.84, 5, 9, 0, 0, Math.PI * 2);
+  ctx.ellipse(x + width*0.35, centerY - height*0.2, 10, 15, -0.5, 0, Math.PI * 2);
   ctx.fill();
 
-  // Curly tail (left/back)
-  ctx.strokeStyle = '#FF9BAE';
-  ctx.lineWidth = 2.5;
+  // Stubby little legs
+  ctx.fillStyle = '#FFB6C1';
   ctx.beginPath();
-  ctx.arc(x + width * 0.08, centerY - height * 0.02, 5, -Math.PI * 0.5, Math.PI);
+  ctx.ellipse(x + width*0.65, y + height*0.88, 6, 10, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.ellipse(x + width*0.35, y + height*0.88, 6, 10, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Curly tail
+  ctx.strokeStyle = '#FF9BAE';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.arc(x + width*0.05, centerY, 8, 0, Math.PI * 1.5);
   ctx.stroke();
 }
 
@@ -340,103 +299,111 @@ function drawLemur(
   isBlinking: boolean,
   frameIndex: number
 ) {
-  // PROFILE VIEW - facing RIGHT, cute big-eyed lemur
+  // REALISTIC CUTE STYLE - natural lemur posture, alert eyes
   const centerX = x + width / 2;
   const centerY = y + height / 2;
 
-  // Slim body
-  const bodyGradient = ctx.createRadialGradient(
-    centerX - width * 0.08, centerY, 0,
-    centerX - width * 0.08, centerY, width * 0.4
-  );
+  // Natural lemur body (more vertical)
+  const bodyGradient = ctx.createRadialGradient(centerX, centerY + height*0.05, 0, centerX, centerY + height*0.05, width*0.25);
   bodyGradient.addColorStop(0, '#A0522D');
+  bodyGradient.addColorStop(0.5, '#8B4513');
   bodyGradient.addColorStop(1, '#6B3410');
-
   ctx.fillStyle = bodyGradient;
   ctx.beginPath();
-  ctx.ellipse(centerX - width * 0.08, centerY, width * 0.35, height * 0.4, -0.1, 0, Math.PI * 2);
+  ctx.ellipse(centerX, centerY + height*0.05, width*0.2, height*0.3, 0, 0, Math.PI * 2);
   ctx.fill();
 
-  // Cream belly
-  ctx.fillStyle = '#D2B48C';
+  // Belly patch
+  ctx.fillStyle = 'rgba(222, 184, 135, 0.6)';
   ctx.beginPath();
-  ctx.ellipse(centerX - width * 0.08, centerY + height * 0.05, width * 0.22, height * 0.28, -0.1, 0, Math.PI * 2);
+  ctx.ellipse(x + width*0.55, centerY + height*0.08, width*0.12, height*0.22, 0, 0, Math.PI * 2);
   ctx.fill();
 
-  // Cute round head (RIGHT side)
-  const headGradient = ctx.createRadialGradient(
-    x + width * 0.75, centerY - height * 0.22, 0,
-    x + width * 0.75, centerY - height * 0.22, 12
-  );
-  headGradient.addColorStop(0, '#A0522D');
-  headGradient.addColorStop(1, '#8B4513');
-
-  ctx.fillStyle = headGradient;
+  // Head
+  ctx.fillStyle = '#A0522D';
   ctx.beginPath();
-  ctx.arc(x + width * 0.75, centerY - height * 0.22, 11, 0, Math.PI * 2);
+  ctx.ellipse(x + width*0.78, centerY - height*0.18, 11, 13, 0.1, 0, Math.PI * 2);
   ctx.fill();
 
-  // Pointy ear
-  ctx.fillStyle = '#8B4513';
+  // Face markings
+  ctx.fillStyle = '#F5DEB3';
   ctx.beginPath();
-  ctx.moveTo(x + width * 0.73, centerY - height * 0.32);
-  ctx.lineTo(x + width * 0.70, centerY - height * 0.42);
-  ctx.lineTo(x + width * 0.76, centerY - height * 0.35);
-  ctx.closePath();
+  ctx.ellipse(x + width*0.82, centerY - height*0.16, 6, 8, 0, 0, Math.PI * 2);
   ctx.fill();
 
-  // Long striped tail (curves behind, animated)
-  const tailSwing = Math.sin(frameIndex * 0.5) * 12;
-  const tailSegments = 9;
-  for (let i = 0; i < tailSegments; i++) {
-    ctx.fillStyle = i % 2 === 0 ? '#A0522D' : '#654321';
-    const progress = i / tailSegments;
-    const tailX = x + width * 0.15 - i * 6 + tailSwing * progress;
-    const tailY = centerY - height * 0.12 + Math.sin(progress * Math.PI * 1.5) * 18 - tailSwing * 0.4;
-
-    ctx.beginPath();
-    ctx.ellipse(tailX, tailY, 3.5, 7, -progress * 0.6, 0, Math.PI * 2);
-    ctx.fill();
-  }
-
-  // Thin legs (2 visible)
-  ctx.fillStyle = '#8B4513';
-  // Front leg
-  ctx.beginPath();
-  ctx.ellipse(x + width * 0.6, y + height * 0.78, 3, 13, 0.1, 0, Math.PI * 2);
-  ctx.fill();
-  // Back leg
-  ctx.beginPath();
-  ctx.ellipse(x + width * 0.35, y + height * 0.8, 3, 12, -0.1, 0, Math.PI * 2);
-  ctx.fill();
-
-  // Huge adorable eye (signature lemur feature)
-  const eyeX = x + width * 0.78;
-  const eyeY = centerY - height * 0.24;
-
-  ctx.fillStyle = '#FFFFFF';
-  ctx.beginPath();
-  ctx.arc(eyeX, eyeY, 6, 0, Math.PI * 2);
-  ctx.fill();
+  // Alert eyes
+  const eyeX = x + width*0.83;
+  const eyeY = centerY - height*0.2;
 
   if (!isBlinking) {
-    ctx.fillStyle = '#000000';
+    ctx.fillStyle = '#FFD700';
     ctx.beginPath();
     ctx.arc(eyeX, eyeY, 4, 0, Math.PI * 2);
     ctx.fill();
 
+    ctx.fillStyle = '#000000';
+    ctx.beginPath();
+    ctx.arc(eyeX, eyeY, 2.5, 0, Math.PI * 2);
+    ctx.fill();
+
     ctx.fillStyle = '#FFFFFF';
     ctx.beginPath();
-    ctx.arc(eyeX + 1.5, eyeY - 1, 2, 0, Math.PI * 2);
+    ctx.arc(eyeX + 1, eyeY - 1, 1, 0, Math.PI * 2);
     ctx.fill();
   } else {
     ctx.strokeStyle = '#000000';
     ctx.lineWidth = 2;
     ctx.beginPath();
-    ctx.moveTo(eyeX - 5, eyeY);
-    ctx.lineTo(eyeX + 5, eyeY);
+    ctx.moveTo(eyeX - 3, eyeY);
+    ctx.lineTo(eyeX + 3, eyeY);
     ctx.stroke();
   }
+
+  // Ear
+  ctx.fillStyle = '#6B3410';
+  ctx.beginPath();
+  ctx.ellipse(x + width*0.72, centerY - height*0.26, 5, 8, -0.3, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Realistic ringed tail (animated swing)
+  const tailSwing = Math.sin(frameIndex * 0.5) * 8;
+  const tailSegments = 10;
+  for (let i = 0; i < tailSegments; i++) {
+    ctx.fillStyle = i % 2 === 0 ? '#8B4513' : '#F5DEB3';
+    const progress = i / tailSegments;
+    const tailX = x + width*0.22 - i * 5 + tailSwing * progress;
+    const tailY = centerY - height*0.12 + Math.sin(progress * Math.PI * 1.2) * 16;
+
+    ctx.beginPath();
+    ctx.ellipse(
+      tailX,
+      tailY,
+      7,
+      10,
+      0.5,
+      0,
+      Math.PI * 2
+    );
+    ctx.fill();
+  }
+
+  // Realistic legs (longer)
+  ctx.fillStyle = '#A0522D';
+  ctx.beginPath();
+  ctx.ellipse(x + width*0.58, y + height*0.85, 5, 16, 0.15, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.ellipse(x + width*0.42, y + height*0.85, 5, 16, -0.15, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Paws
+  ctx.fillStyle = '#6B3410';
+  ctx.beginPath();
+  ctx.ellipse(x + width*0.58, y + height*0.98, 6, 4, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.ellipse(x + width*0.42, y + height*0.98, 6, 4, 0, 0, Math.PI * 2);
+  ctx.fill();
 }
 
 function drawAxolotl(
@@ -448,130 +415,95 @@ function drawAxolotl(
   isBlinking: boolean,
   frameIndex: number
 ) {
-  // PROFILE VIEW - facing RIGHT, adorable kawaii axolotl
+  // CHIBI STYLE - huge head, big eyes, frilly gills
   const centerX = x + width / 2;
   const centerY = y + height / 2;
 
-  // Elongated chubby body
-  const bodyGradient = ctx.createRadialGradient(
-    centerX - width * 0.1, centerY, 0,
-    centerX - width * 0.1, centerY, width * 0.42
-  );
-  bodyGradient.addColorStop(0, '#FF69B4');
-  bodyGradient.addColorStop(1, '#FF1493');
-
-  ctx.fillStyle = bodyGradient;
-  ctx.beginPath();
-  ctx.ellipse(centerX - width * 0.1, centerY, width * 0.4, height * 0.35, 0, 0, Math.PI * 2);
-  ctx.fill();
-
-  // Wide cute head (RIGHT side)
-  const headGradient = ctx.createRadialGradient(
-    x + width * 0.75, centerY - height * 0.12, 0,
-    x + width * 0.75, centerY - height * 0.12, 13
-  );
-  headGradient.addColorStop(0, '#FF69B4');
-  headGradient.addColorStop(1, '#FF1493');
-
+  // HUGE round head (chibi style)
+  const headGradient = ctx.createRadialGradient(x + width*0.65, centerY - height*0.1, 0, x + width*0.65, centerY - height*0.1, width*0.35);
+  headGradient.addColorStop(0, '#FFB6D9');
+  headGradient.addColorStop(1, '#FF69B4');
   ctx.fillStyle = headGradient;
   ctx.beginPath();
-  ctx.arc(x + width * 0.75, centerY - height * 0.12, 12, 0, Math.PI * 2);
+  ctx.arc(x + width*0.65, centerY - height*0.1, width*0.32, 0, Math.PI * 2);
   ctx.fill();
 
-  // Feathery gill fronds (waving, on top of head)
-  const time = frameIndex * 0.3;
-  ctx.fillStyle = '#FF1493';
-
-  for (let i = 0; i < 3; i++) {
-    const wave = Math.sin(time + i * 0.5) * 5;
-    const gillX = x + width * 0.72;
-    const gillY = centerY - height * 0.22 - i * 3;
-
-    ctx.beginPath();
-    ctx.moveTo(gillX, gillY);
-    ctx.quadraticCurveTo(
-      gillX - 6 + wave, gillY - 8,
-      gillX - 9 + wave, gillY - 6
-    );
-    ctx.lineTo(gillX - 7 + wave, gillY - 4);
-    ctx.quadraticCurveTo(
-      gillX - 4 + wave, gillY - 5,
-      gillX, gillY
-    );
-    ctx.closePath();
-    ctx.fill();
-  }
-
-  // Tapered tail fin (LEFT/back)
-  ctx.fillStyle = '#FF1493';
-  ctx.beginPath();
-  ctx.moveTo(x + width * 0.15, centerY - height * 0.15);
-  ctx.quadraticCurveTo(
-    x - width * 0.05, centerY - height * 0.08,
-    x, centerY + height * 0.08
-  );
-  ctx.quadraticCurveTo(
-    x + width * 0.05, centerY,
-    x + width * 0.15, centerY + height * 0.12
-  );
-  ctx.closePath();
-  ctx.fill();
-
-  // Stubby legs (2 visible)
+  // Tiny body
   ctx.fillStyle = '#FF69B4';
-  // Front leg
   ctx.beginPath();
-  ctx.ellipse(x + width * 0.6, centerY + height * 0.28, 3.5, 9, 0.2, 0, Math.PI * 2);
-  ctx.fill();
-  // Back leg
-  ctx.beginPath();
-  ctx.ellipse(x + width * 0.35, centerY + height * 0.3, 3.5, 8, -0.1, 0, Math.PI * 2);
+  ctx.ellipse(x + width*0.45, centerY + height*0.15, width*0.25, height*0.22, 0, 0, Math.PI * 2);
   ctx.fill();
 
-  // Cute spots
-  ctx.fillStyle = '#FF1493';
-  ctx.globalAlpha = 0.5;
-  const spots = [
-    {x: centerX - width * 0.05, y: centerY - height * 0.08},
-    {x: centerX + width * 0.1, y: centerY + height * 0.05},
-    {x: centerX - width * 0.15, y: centerY + height * 0.1},
-  ];
-  spots.forEach(spot => {
-    ctx.beginPath();
-    ctx.arc(spot.x, spot.y, 2.5, 0, Math.PI * 2);
-    ctx.fill();
-  });
-  ctx.globalAlpha = 1.0;
-
-  // Kawaii eye
-  const eyeX = x + width * 0.77;
-  const eyeY = centerY - height * 0.16;
+  // HUGE kawaii eyes
+  const eyeX = x + width*0.72;
+  const eyeY = centerY - height*0.14;
 
   if (!isBlinking) {
     ctx.fillStyle = '#000000';
     ctx.beginPath();
-    ctx.arc(eyeX, eyeY, 3.5, 0, Math.PI * 2);
+    ctx.arc(eyeX, eyeY, 7, 0, Math.PI * 2);
     ctx.fill();
 
     ctx.fillStyle = '#FFFFFF';
     ctx.beginPath();
-    ctx.arc(eyeX + 1, eyeY - 1, 1.5, 0, Math.PI * 2);
+    ctx.arc(eyeX + 2, eyeY - 2, 3, 0, Math.PI * 2);
     ctx.fill();
   } else {
     ctx.strokeStyle = '#000000';
     ctx.lineWidth = 2;
     ctx.beginPath();
-    ctx.moveTo(eyeX - 3, eyeY);
-    ctx.lineTo(eyeX + 3, eyeY);
+    ctx.moveTo(eyeX - 6, eyeY);
+    ctx.lineTo(eyeX + 6, eyeY);
     ctx.stroke();
   }
 
-  // Sweet smile
+  // Big smile
   ctx.strokeStyle = '#FF1493';
-  ctx.lineWidth = 1.5;
+  ctx.lineWidth = 2;
   ctx.beginPath();
-  ctx.arc(x + width * 0.75, eyeY + 6, 5, 0.3, Math.PI - 0.3);
+  ctx.arc(x + width*0.72, centerY - height*0.05, 8, 0.2, Math.PI - 0.2);
   ctx.stroke();
+
+  // HUGE frilly gills (3 on each side) - animated wave
+  const time = frameIndex * 0.3;
+  ctx.strokeStyle = '#FF1493';
+  ctx.lineWidth = 2;
+  for (let i = 0; i < 3; i++) {
+    const wave = Math.sin(time + i * 0.5) * 3;
+    ctx.beginPath();
+    ctx.moveTo(x + width*0.82, centerY - height*0.18 + i*6);
+    for (let j = 0; j < 4; j++) {
+      ctx.lineTo(x + width*0.82 + j*4, centerY - height*0.18 + i*6 + (j % 2) * 3 + wave);
+    }
+    ctx.stroke();
+  }
+
+  // Spots/freckles
+  ctx.fillStyle = 'rgba(255, 20, 147, 0.4)';
+  for (let i = 0; i < 5; i++) {
+    const spotX = x + width*(0.55 + (i * 0.07));
+    const spotY = centerY - height*(0.05 + (i % 2) * 0.08);
+    ctx.beginPath();
+    ctx.arc(spotX, spotY, 2, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // Stubby legs
+  ctx.fillStyle = '#FF69B4';
+  ctx.beginPath();
+  ctx.ellipse(x + width*0.52, y + height*0.82, 5, 8, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.ellipse(x + width*0.38, y + height*0.82, 5, 8, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Tail fin
+  ctx.fillStyle = '#FF69B4';
+  ctx.beginPath();
+  ctx.moveTo(x + width*0.2, centerY + height*0.15);
+  ctx.quadraticCurveTo(x + width*0.05, centerY + height*0.05, x + width*0.15, centerY + height*0.2);
+  ctx.quadraticCurveTo(x + width*0.05, centerY + height*0.25, x + width*0.2, centerY + height*0.15);
+  ctx.fill();
 }
 
 function drawEyes(
