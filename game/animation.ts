@@ -221,32 +221,32 @@ function drawPig(
   const centerY = y + height / 2;
 
   // Round body (HUGE)
-  const bodyGradient = ctx.createRadialGradient(centerX, centerY + height*0.05, 0, centerX, centerY + height*0.05, width*0.5);
+  const bodyGradient = ctx.createRadialGradient(centerX, y + height*0.55, 0, centerX, y + height*0.55, width*0.5);
   bodyGradient.addColorStop(0, '#FFB6C1');
   bodyGradient.addColorStop(1, '#FF9BAE');
   ctx.fillStyle = bodyGradient;
   ctx.beginPath();
-  ctx.arc(centerX, centerY + height*0.05, width*0.45, 0, Math.PI * 2);
+  ctx.arc(centerX, y + height*0.55, width*0.45, 0, Math.PI * 2);
   ctx.fill();
 
   // HUGE snout sticking out
   ctx.fillStyle = '#FFB6C1';
   ctx.beginPath();
-  ctx.ellipse(x + width*0.85, centerY - height*0.05, 18, 14, 0, 0, Math.PI * 2);
+  ctx.ellipse(x + width*0.85, y + height*0.45, 18, 14, 0, 0, Math.PI * 2);
   ctx.fill();
 
   // Nostrils
   ctx.fillStyle = '#D4909E';
   ctx.beginPath();
-  ctx.ellipse(x + width*0.82, centerY - height*0.07, 3, 4, 0, 0, Math.PI * 2);
+  ctx.ellipse(x + width*0.82, y + height*0.43, 3, 4, 0, 0, Math.PI * 2);
   ctx.fill();
   ctx.beginPath();
-  ctx.ellipse(x + width*0.82, centerY - height*0.02, 3, 4, 0, 0, Math.PI * 2);
+  ctx.ellipse(x + width*0.82, y + height*0.48, 3, 4, 0, 0, Math.PI * 2);
   ctx.fill();
 
   // HUGE eyes
   const eyeX = x + width*0.62;
-  const eyeY = centerY - height*0.15;
+  const eyeY = y + height*0.35;
 
   if (!isBlinking) {
     ctx.fillStyle = '#000000';
@@ -256,7 +256,7 @@ function drawPig(
 
     ctx.fillStyle = '#FFFFFF';
     ctx.beginPath();
-    ctx.arc(eyeX + 2, eyeY - 2, 2.5, 0, Math.PI * 2);
+    ctx.arc(x + width*0.64, y + height*0.33, 2.5, 0, Math.PI * 2);
     ctx.fill();
   } else {
     ctx.strokeStyle = '#000000';
@@ -270,23 +270,23 @@ function drawPig(
   // Tiny floppy ear
   ctx.fillStyle = '#FF9BAE';
   ctx.beginPath();
-  ctx.ellipse(x + width*0.35, centerY - height*0.2, 10, 15, -0.5, 0, Math.PI * 2);
+  ctx.ellipse(x + width*0.35, y + height*0.3, 10, 15, -0.5, 0, Math.PI * 2);
   ctx.fill();
 
   // Stubby little legs
   ctx.fillStyle = '#FFB6C1';
   ctx.beginPath();
-  ctx.ellipse(x + width*0.65, centerY + height*0.38, 6, 10, 0, 0, Math.PI * 2);
+  ctx.ellipse(x + width*0.65, y + height*0.88, 6, 10, 0, 0, Math.PI * 2);
   ctx.fill();
   ctx.beginPath();
-  ctx.ellipse(x + width*0.35, centerY + height*0.38, 6, 10, 0, 0, Math.PI * 2);
+  ctx.ellipse(x + width*0.35, y + height*0.88, 6, 10, 0, 0, Math.PI * 2);
   ctx.fill();
 
   // Curly tail
   ctx.strokeStyle = '#FF9BAE';
   ctx.lineWidth = 3;
   ctx.beginPath();
-  ctx.arc(x + width*0.05, centerY, 8, 0, Math.PI * 1.5);
+  ctx.arc(x + width*0.05, y + height*0.5, 8, 0, Math.PI * 1.5);
   ctx.stroke();
 }
 
