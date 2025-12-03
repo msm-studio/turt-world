@@ -216,17 +216,15 @@ function drawPig(
   height: number,
   isBlinking: boolean
 ) {
-  // CHIBI STYLE - round body, huge snout, tiny legs
-  const centerX = x + width / 2;
-  const centerY = y + height / 2;
+  ctx.save();
 
   // Round body (HUGE)
-  const bodyGradient = ctx.createRadialGradient(centerX, y + height*0.55, 0, centerX, y + height*0.55, width*0.5);
+  const bodyGradient = ctx.createRadialGradient(x + width/2, y + height*0.55, 0, x + width/2, y + height*0.55, width*0.5);
   bodyGradient.addColorStop(0, '#FFB6C1');
   bodyGradient.addColorStop(1, '#FF9BAE');
   ctx.fillStyle = bodyGradient;
   ctx.beginPath();
-  ctx.arc(centerX, y + height*0.55, width*0.45, 0, Math.PI * 2);
+  ctx.arc(x + width/2, y + height*0.55, width*0.45, 0, Math.PI * 2);
   ctx.fill();
 
   // HUGE snout sticking out
@@ -245,13 +243,10 @@ function drawPig(
   ctx.fill();
 
   // HUGE eyes
-  const eyeX = x + width*0.62;
-  const eyeY = y + height*0.35;
-
   if (!isBlinking) {
     ctx.fillStyle = '#000000';
     ctx.beginPath();
-    ctx.arc(eyeX, eyeY, 6, 0, Math.PI * 2);
+    ctx.arc(x + width*0.62, y + height*0.35, 6, 0, Math.PI * 2);
     ctx.fill();
 
     ctx.fillStyle = '#FFFFFF';
@@ -262,8 +257,8 @@ function drawPig(
     ctx.strokeStyle = '#000000';
     ctx.lineWidth = 2;
     ctx.beginPath();
-    ctx.moveTo(eyeX - 5, eyeY);
-    ctx.lineTo(eyeX + 5, eyeY);
+    ctx.moveTo(x + width*0.62 - 5, y + height*0.35);
+    ctx.lineTo(x + width*0.62 + 5, y + height*0.35);
     ctx.stroke();
   }
 
@@ -288,6 +283,8 @@ function drawPig(
   ctx.beginPath();
   ctx.arc(x + width*0.05, y + height*0.5, 8, 0, Math.PI * 1.5);
   ctx.stroke();
+
+  ctx.restore();
 }
 
 function drawLemur(
