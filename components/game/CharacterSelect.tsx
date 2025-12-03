@@ -17,7 +17,7 @@ const characterColors: Record<string, string> = {
 const characterEmojis: Record<string, string> = {
   Turtle: '🐢',
   Pig: '🐷',
-  Lemur: '🦧',
+  Lemur: '🐵',
   Axolotl: '🦎',
 };
 
