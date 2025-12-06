@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { Character, LeaderboardEntry } from '@/db/supabase';
 import Leaderboard from './Leaderboard';
 
@@ -24,6 +25,8 @@ const characterEmojis: Record<string, string> = {
 };
 
 export default function CharacterSelect({ characters, topScores, onSelect }: CharacterSelectProps) {
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-400 to-orange-300 flex flex-col items-center justify-center p-8">
       <div className="text-center mb-12">
@@ -33,7 +36,7 @@ export default function CharacterSelect({ characters, topScores, onSelect }: Cha
         <p className="text-2xl text-white drop-shadow">Choose Your Character</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mb-12">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mb-8">
         {characters.map((character) => (
           <button
             key={character.id}
@@ -66,12 +69,34 @@ export default function CharacterSelect({ characters, topScores, onSelect }: Cha
         ))}
       </div>
 
-      <Leaderboard entries={topScores} />
+      <button
+        onClick={() => setShowLeaderboard(true)}
+        className="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-3 px-8 rounded-full shadow-2xl transform transition-all hover:scale-105 active:scale-95 mb-8"
+      >
+        🏆 View Leaderboard
+      </button>
 
-      <div className="mt-8 text-white text-center">
+      <div className="text-white text-center">
         <p className="text-lg mb-2">Controls</p>
         <p className="text-sm opacity-75">Arrow Keys or WASD to move • Space or W to jump</p>
       </div>
+
+      {showLeaderboard && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4"
+          onClick={() => setShowLeaderboard(false)}
+        >
+          <div onClick={(e) => e.stopPropagation()}>
+            <Leaderboard entries={topScores} />
+            <button
+              onClick={() => setShowLeaderboard(false)}
+              className="mt-4 w-full bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
