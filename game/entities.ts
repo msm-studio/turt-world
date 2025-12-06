@@ -155,6 +155,35 @@ export class Hazard {
       ctx.beginPath();
       ctx.arc(this.x + this.width / 2, this.y - 2, 2, 0, Math.PI * 2);
       ctx.fill();
+    } else if (this.type === 'icicle') {
+      // Icicle spike pointing down
+      const icicleGradient = ctx.createLinearGradient(this.x, this.y, this.x + this.width, this.y);
+      icicleGradient.addColorStop(0, '#C0E8F9');
+      icicleGradient.addColorStop(0.5, '#E0F4FF');
+      icicleGradient.addColorStop(1, '#C0E8F9');
+      ctx.fillStyle = icicleGradient;
+
+      // Draw icicle shape
+      ctx.beginPath();
+      ctx.moveTo(this.x + this.width / 2, this.y + this.height); // Point at bottom
+      ctx.lineTo(this.x, this.y); // Top left
+      ctx.lineTo(this.x + this.width, this.y); // Top right
+      ctx.closePath();
+      ctx.fill();
+
+      // Outline
+      ctx.strokeStyle = '#7CB9E8';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // Add shimmer effect
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+      ctx.beginPath();
+      ctx.moveTo(this.x + this.width / 2, this.y + this.height);
+      ctx.lineTo(this.x + this.width * 0.3, this.y);
+      ctx.lineTo(this.x + this.width * 0.7, this.y);
+      ctx.closePath();
+      ctx.fill();
     } else {
       // Generic hazard with pulsing effect
       const pulse = Math.sin(Date.now() / 200) * 0.2 + 0.8;
@@ -302,6 +331,16 @@ export class LevelPlatform {
       gradient.addColorStop(0, '#D4A574');
       gradient.addColorStop(0.5, '#DEB887');
       gradient.addColorStop(1, '#D4A574');
+    } else if (this.type === 'ice') {
+      gradient = ctx.createLinearGradient(x, y, x + pos.width, y);
+      gradient.addColorStop(0, '#A8D8EA');
+      gradient.addColorStop(0.5, '#C0E8F9');
+      gradient.addColorStop(1, '#A8D8EA');
+    } else if (this.type === 'snow') {
+      gradient = ctx.createLinearGradient(x, y, x + pos.width, y);
+      gradient.addColorStop(0, '#F0F8FF');
+      gradient.addColorStop(0.5, '#FFFFFF');
+      gradient.addColorStop(1, '#F0F8FF');
     } else {
       gradient = ctx.createLinearGradient(x, y, x + pos.width, y);
       gradient.addColorStop(0, '#909090');
@@ -329,6 +368,27 @@ export class LevelPlatform {
             ctx.fillRect(x + i * 10 + Math.random() * 5, y + j * 10 + Math.random() * 5, 2, 2);
           }
         }
+      }
+    }
+
+    // Ice crystals for ice platforms
+    if (this.type === 'ice') {
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+      for (let i = 0; i < pos.width / 15; i++) {
+        const crystalX = x + i * 15 + Math.random() * 8;
+        const crystalY = y + Math.random() * (pos.height - 4);
+        ctx.fillRect(crystalX, crystalY, 3, 3);
+      }
+    }
+
+    // Snow puffs for snow platforms
+    if (this.type === 'snow') {
+      ctx.fillStyle = 'rgba(220, 230, 255, 0.6)';
+      for (let i = 0; i < pos.width / 12; i++) {
+        const puffX = x + i * 12;
+        ctx.beginPath();
+        ctx.arc(puffX, y - 1, 3, 0, Math.PI, true);
+        ctx.fill();
       }
     }
 
