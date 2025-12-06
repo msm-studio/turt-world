@@ -7,9 +7,13 @@ interface GameUIProps {
   character: Character;
   level: Level;
   deaths: number;
+  score: number;
+  coinsCollected: number;
+  totalCoins: number;
+  currentCombo: number;
 }
 
-export function GameUI({ character, level, deaths }: GameUIProps) {
+export function GameUI({ character, level, deaths, score, coinsCollected, totalCoins, currentCombo }: GameUIProps) {
   const [time, setTime] = useState(0);
 
   useEffect(() => {
@@ -19,6 +23,12 @@ export function GameUI({ character, level, deaths }: GameUIProps) {
 
     return () => clearInterval(interval);
   }, []);
+
+  // Calculate multiplier based on combo
+  let multiplier = 1.0;
+  if (currentCombo >= 15) multiplier = 3.0;
+  else if (currentCombo >= 10) multiplier = 2.0;
+  else if (currentCombo >= 5) multiplier = 1.5;
 
   return (
     <div className="absolute top-4 left-4 bg-black bg-opacity-50 text-white p-4 rounded-lg">
@@ -39,6 +49,22 @@ export function GameUI({ character, level, deaths }: GameUIProps) {
           <span className="font-bold">Deaths:</span>
           <span>{deaths}</span>
         </div>
+        <div className="flex items-center gap-2">
+          <span className="font-bold">Score:</span>
+          <span className="text-yellow-300">{score}</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="font-bold">Coins:</span>
+          <span className="text-yellow-300">{coinsCollected}/{totalCoins}</span>
+        </div>
+        {currentCombo > 0 && (
+          <div className="flex items-center gap-2">
+            <span className="font-bold">Combo:</span>
+            <span className={`font-bold ${multiplier > 1 ? 'text-orange-400 animate-pulse' : 'text-white'}`}>
+              {currentCombo}x {multiplier > 1 && `(${multiplier}x!)`}
+            </span>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -49,6 +75,10 @@ interface WinScreenProps {
   level: Level;
   completionTime: number;
   deaths: number;
+  score: number;
+  coinsCollected: number;
+  totalCoins: number;
+  maxCombo: number;
   onRestart: () => void;
   onMainMenu: () => void;
   onSubmitScore?: (playerName: string) => void;
@@ -59,6 +89,10 @@ export function WinScreen({
   level,
   completionTime,
   deaths,
+  score,
+  coinsCollected,
+  totalCoins,
+  maxCombo,
   onRestart,
   onMainMenu,
   onSubmitScore,
@@ -72,6 +106,8 @@ export function WinScreen({
       setScoreSubmitted(true);
     }
   };
+
+  const isPerfectCollection = coinsCollected === totalCoins && totalCoins > 0;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
@@ -95,6 +131,26 @@ export function WinScreen({
               <span>Deaths:</span>
               <span className="font-bold">{deaths}</span>
             </div>
+            <div className="border-t border-white border-opacity-30 my-3"></div>
+            <div className="flex justify-between text-white text-xl">
+              <span className="font-bold">Final Score:</span>
+              <span className="font-bold text-yellow-200">{score}</span>
+            </div>
+            <div className="flex justify-between text-white text-lg">
+              <span>Coins Collected:</span>
+              <span className={isPerfectCollection ? 'font-bold text-yellow-200' : 'font-bold'}>
+                {coinsCollected}/{totalCoins} {isPerfectCollection && '🎉'}
+              </span>
+            </div>
+            <div className="flex justify-between text-white text-lg">
+              <span>Max Combo:</span>
+              <span className="font-bold">{maxCombo}x</span>
+            </div>
+            {isPerfectCollection && (
+              <div className="text-yellow-200 font-bold text-sm animate-pulse">
+                +5000 Perfect Collection Bonus!
+              </div>
+            )}
           </div>
 
           {!scoreSubmitted && onSubmitScore && (

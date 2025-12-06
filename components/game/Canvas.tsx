@@ -11,8 +11,21 @@ interface CanvasProps {
   height: number;
   character: Character;
   level: Level;
-  onLevelComplete: (time: number, deaths: number) => void;
+  onLevelComplete: (
+    time: number,
+    deaths: number,
+    score: number,
+    coinsCollected: number,
+    totalCoins: number,
+    maxCombo: number
+  ) => void;
   onLevelFailed: () => void;
+  onGameUpdate?: (
+    score: number,
+    coinsCollected: number,
+    totalCoins: number,
+    currentCombo: number
+  ) => void;
 }
 
 export default function Canvas({
@@ -22,6 +35,7 @@ export default function Canvas({
   level,
   onLevelComplete,
   onLevelFailed,
+  onGameUpdate,
 }: CanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationFrameRef = useRef<number | undefined>(undefined);
@@ -30,6 +44,22 @@ export default function Canvas({
   const levelManagerRef = useRef<LevelManager | undefined>(undefined);
   const lastTimeRef = useRef<number>(0);
   const isRespawningRef = useRef<boolean>(false);
+  const onGameUpdateRef = useRef(onGameUpdate);
+  const onLevelCompleteRef = useRef(onLevelComplete);
+  const onLevelFailedRef = useRef(onLevelFailed);
+
+  // Keep the refs updated with the latest callbacks
+  useEffect(() => {
+    onGameUpdateRef.current = onGameUpdate;
+  }, [onGameUpdate]);
+
+  useEffect(() => {
+    onLevelCompleteRef.current = onLevelComplete;
+  }, [onLevelComplete]);
+
+  useEffect(() => {
+    onLevelFailedRef.current = onLevelFailed;
+  }, [onLevelFailed]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -78,16 +108,33 @@ export default function Canvas({
         // Step physics
         physicsWorldRef.current?.step(deltaTime);
 
+        // Update parent component with current game state
+        if (onGameUpdateRef.current) {
+          onGameUpdateRef.current(
+            currentLevel.getScore(),
+            currentLevel.getCoinsCollected(),
+            currentLevel.getTotalCoins(),
+            currentLevel.getCurrentCombo()
+          );
+        }
+
         // Check win/lose conditions
         if (currentLevel.isLevelComplete()) {
-          onLevelComplete(currentLevel.getCompletionTime(), currentLevel.getDeaths());
+          onLevelCompleteRef.current(
+            currentLevel.getCompletionTime(),
+            currentLevel.getDeaths(),
+            currentLevel.getScore(),
+            currentLevel.getCoinsCollected(),
+            currentLevel.getTotalCoins(),
+            currentLevel.getMaxCombo()
+          );
           isRunning = false;
           return;
         }
 
         if (currentLevel.isLevelFailed() && !isRespawningRef.current) {
           isRespawningRef.current = true;
-          onLevelFailed();
+          onLevelFailedRef.current();
           // Respawn after a short delay
           setTimeout(() => {
             currentLevel.respawn(character);
@@ -115,7 +162,7 @@ export default function Canvas({
       inputManagerRef.current?.cleanup();
       levelManagerRef.current?.unloadLevel();
     };
-  }, [character, level, width, height, onLevelComplete, onLevelFailed]);
+  }, [character, level, width, height]);
 
   return (
     <canvas

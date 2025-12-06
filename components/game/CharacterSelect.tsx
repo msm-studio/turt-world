@@ -1,9 +1,11 @@
 'use client';
 
-import { Character } from '@/db/supabase';
+import { Character, LeaderboardEntry } from '@/db/supabase';
+import Leaderboard from './Leaderboard';
 
 interface CharacterSelectProps {
   characters: Character[];
+  topScores: LeaderboardEntry[];
   onSelect: (character: Character) => void;
 }
 
@@ -21,7 +23,7 @@ const characterEmojis: Record<string, string> = {
   Axolotl: '🦎',
 };
 
-export default function CharacterSelect({ characters, onSelect }: CharacterSelectProps) {
+export default function CharacterSelect({ characters, topScores, onSelect }: CharacterSelectProps) {
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-400 to-orange-300 flex flex-col items-center justify-center p-8">
       <div className="text-center mb-12">
@@ -31,7 +33,7 @@ export default function CharacterSelect({ characters, onSelect }: CharacterSelec
         <p className="text-2xl text-white drop-shadow">Choose Your Character</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mb-12">
         {characters.map((character) => (
           <button
             key={character.id}
@@ -64,7 +66,9 @@ export default function CharacterSelect({ characters, onSelect }: CharacterSelec
         ))}
       </div>
 
-      <div className="mt-12 text-white text-center">
+      <Leaderboard entries={topScores} />
+
+      <div className="mt-8 text-white text-center">
         <p className="text-lg mb-2">Controls</p>
         <p className="text-sm opacity-75">Arrow Keys or WASD to move • Space or W to jump</p>
       </div>

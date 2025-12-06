@@ -91,6 +91,10 @@ export class Player {
     };
   }
 
+  getPhysicsBody() {
+    return this.physicsBody;
+  }
+
   destroy() {
     this.physicsBody.destroy();
   }
@@ -348,5 +352,100 @@ export class LevelPlatform {
     ctx.strokeRect(x, y, pos.width, pos.height);
 
     ctx.restore();
+  }
+}
+
+// Collectible coin entity
+export class Collectible {
+  private x: number;
+  private y: number;
+  private width: number = 20;
+  private height: number = 20;
+  private collected: boolean = false;
+
+  constructor(x: number, y: number) {
+    this.x = x;
+    this.y = y;
+  }
+
+  render(ctx: CanvasRenderingContext2D) {
+    if (this.collected) return;
+
+    ctx.save();
+
+    // Floating animation
+    const time = Date.now() / 1000;
+    const floatOffset = Math.sin(time * 3 + this.x * 0.01) * 3;
+
+    // Glow effect
+    const glowGradient = ctx.createRadialGradient(
+      this.x, this.y + floatOffset,
+      0,
+      this.x, this.y + floatOffset,
+      this.width
+    );
+    glowGradient.addColorStop(0, 'rgba(255, 215, 0, 0.8)');
+    glowGradient.addColorStop(0.5, 'rgba(255, 215, 0, 0.4)');
+    glowGradient.addColorStop(1, 'rgba(255, 215, 0, 0)');
+    ctx.fillStyle = glowGradient;
+    ctx.beginPath();
+    ctx.arc(this.x, this.y + floatOffset, this.width, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Coin body with gradient
+    const coinGradient = ctx.createRadialGradient(
+      this.x - 3, this.y + floatOffset - 3,
+      0,
+      this.x, this.y + floatOffset,
+      this.width / 2
+    );
+    coinGradient.addColorStop(0, '#FFD700');
+    coinGradient.addColorStop(0.5, '#FFA500');
+    coinGradient.addColorStop(1, '#FF8C00');
+    ctx.fillStyle = coinGradient;
+    ctx.beginPath();
+    ctx.arc(this.x, this.y + floatOffset, this.width / 2, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Inner circle detail
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+    ctx.beginPath();
+    ctx.arc(this.x, this.y + floatOffset, this.width / 3, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Shine effect
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+    ctx.beginPath();
+    ctx.arc(this.x - 2, this.y + floatOffset - 2, 3, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.restore();
+  }
+
+  checkCollision(player: Player): boolean {
+    if (this.collected) return false;
+
+    const playerBounds = player.getBounds();
+    const coinRadius = this.width / 2;
+
+    // Check if player's bounding box overlaps with coin circle
+    return (
+      playerBounds.x < this.x + coinRadius &&
+      playerBounds.x + playerBounds.width > this.x - coinRadius &&
+      playerBounds.y < this.y + coinRadius &&
+      playerBounds.y + playerBounds.height > this.y - coinRadius
+    );
+  }
+
+  collect() {
+    this.collected = true;
+  }
+
+  isCollected(): boolean {
+    return this.collected;
+  }
+
+  reset() {
+    this.collected = false;
   }
 }

@@ -1,20 +1,33 @@
 import { PhysicsWorld } from './physics';
-import { Player, LevelPlatform, Hazard, Goal } from './entities';
+import { Player, LevelPlatform, Hazard, Goal, Collectible } from './entities';
 import { Level, Character } from '@/db/supabase';
+import { Camera } from './camera';
 
 export class GameLevel {
   private platforms: LevelPlatform[] = [];
   private hazards: Hazard[] = [];
   private goal: Goal;
+  private collectibles: Collectible[] = [];
   private player: Player | null = null;
   private levelData: Level;
   private startTime: number = 0;
   private deaths: number = 0;
   private isComplete: boolean = false;
   private isFailed: boolean = false;
+  private camera: Camera;
+  private score: number = 0;
+  private coinsCollected: number = 0;
+  private currentCombo: number = 0;
+  private maxCombo: number = 0;
+  private isGrounded: boolean = false;
 
   constructor(private world: PhysicsWorld, levelData: Level) {
     this.levelData = levelData;
+
+    // Calculate world bounds from level layout
+    const worldWidth = this.calculateWorldWidth();
+    const worldHeight = 700; // Standard height
+    this.camera = new Camera(1300, 600, worldWidth, worldHeight);
 
     // Create platforms
     for (const platformData of levelData.layout.platforms) {
@@ -46,6 +59,13 @@ export class GameLevel {
     // Create goal
     const goalData = levelData.layout.goal;
     this.goal = new Goal(goalData.x, goalData.y, goalData.width, goalData.height);
+
+    // Create collectibles
+    if (levelData.layout.collectibles) {
+      for (const coinData of levelData.layout.collectibles) {
+        this.collectibles.push(new Collectible(coinData.x, coinData.y));
+      }
+    }
   }
 
   spawnPlayer(characterData: Character) {
@@ -63,6 +83,46 @@ export class GameLevel {
 
     this.player.update(input, deltaTime);
 
+    // Get player position for camera and bounds checking
+    const playerPos = this.player.getPosition();
+
+    // Update camera to follow player
+    this.camera.follow(playerPos.x, playerPos.y);
+
+    // Check if player is grounded (for combo system)
+    const wasGrounded = this.isGrounded;
+    this.isGrounded = this.player.getPhysicsBody().isGrounded();
+
+    // Reset combo when landing on ground
+    if (this.isGrounded && !wasGrounded) {
+      this.currentCombo = 0;
+    }
+
+    // Check collectible collisions
+    for (const collectible of this.collectibles) {
+      if (collectible.checkCollision(this.player)) {
+        collectible.collect();
+        this.coinsCollected++;
+
+        // Combo only increases when collecting in the air
+        if (!this.isGrounded) {
+          this.currentCombo++;
+          if (this.currentCombo > this.maxCombo) {
+            this.maxCombo = this.currentCombo;
+          }
+        }
+
+        // Calculate score with combo multiplier
+        const basePoints = 100;
+        let multiplier = 1.0;
+        if (this.currentCombo >= 15) multiplier = 3.0;
+        else if (this.currentCombo >= 10) multiplier = 2.0;
+        else if (this.currentCombo >= 5) multiplier = 1.5;
+
+        this.score += Math.floor(basePoints * multiplier);
+      }
+    }
+
     // Check hazard collisions
     for (const hazard of this.hazards) {
       if (hazard.checkCollision(this.player)) {
@@ -74,10 +134,14 @@ export class GameLevel {
     // Check goal collision
     if (this.goal.checkCollision(this.player)) {
       this.isComplete = true;
+      // Add perfect collection bonus
+      const totalCoins = this.collectibles.length;
+      if (this.coinsCollected === totalCoins && totalCoins > 0) {
+        this.score += 5000;
+      }
     }
 
     // Check if player fell off the world
-    const playerPos = this.player.getPosition();
     if (playerPos.y > 700) {
       this.handlePlayerDeath();
     }
@@ -94,7 +158,9 @@ export class GameLevel {
   }
 
   render(ctx: CanvasRenderingContext2D, canvasWidth: number, canvasHeight: number) {
-    // Draw base background
+    const cameraX = this.camera.getX();
+
+    // Draw base background (no camera transform)
     ctx.fillStyle = this.levelData.layout.background.color;
     ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 
@@ -179,9 +245,18 @@ export class GameLevel {
       ctx.fill();
     }
 
+    // Apply camera transform for game objects
+    ctx.save();
+    this.camera.apply(ctx);
+
     // Draw platforms
     for (const platform of this.platforms) {
       platform.render(ctx);
+    }
+
+    // Draw collectibles
+    for (const collectible of this.collectibles) {
+      collectible.render(ctx);
     }
 
     // Draw hazards
@@ -196,6 +271,9 @@ export class GameLevel {
     if (this.player) {
       this.player.render(ctx);
     }
+
+    // Restore camera transform
+    ctx.restore();
   }
 
   getCompletionTime(): number {
@@ -216,6 +294,44 @@ export class GameLevel {
 
   getLevelData(): Level {
     return this.levelData;
+  }
+
+  getScore(): number {
+    return this.score;
+  }
+
+  getCoinsCollected(): number {
+    return this.coinsCollected;
+  }
+
+  getTotalCoins(): number {
+    return this.collectibles.length;
+  }
+
+  getCurrentCombo(): number {
+    return this.currentCombo;
+  }
+
+  getMaxCombo(): number {
+    return this.maxCombo;
+  }
+
+  private calculateWorldWidth(): number {
+    // Find the rightmost point in the level
+    let maxX = 0;
+
+    // Check platforms
+    for (const platform of this.levelData.layout.platforms) {
+      const right = platform.x + platform.width;
+      if (right > maxX) maxX = right;
+    }
+
+    // Check goal
+    const goalRight = this.levelData.layout.goal.x + this.levelData.layout.goal.width;
+    if (goalRight > maxX) maxX = goalRight;
+
+    // Add some padding
+    return Math.max(maxX + 200, 1300);
   }
 
   destroy() {

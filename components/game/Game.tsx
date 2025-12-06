@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Character, Level, getCharacters, getLevels, submitScore } from '@/db/supabase';
+import { Character, Level, LeaderboardEntry, getCharacters, getLevels, getTopScores, submitScore } from '@/db/supabase';
 import CharacterSelect from './CharacterSelect';
 import Canvas from './Canvas';
 import { GameUI, WinScreen } from './UI';
@@ -12,20 +12,31 @@ export default function Game() {
   );
   const [characters, setCharacters] = useState<Character[]>([]);
   const [levels, setLevels] = useState<Level[]>([]);
+  const [topScores, setTopScores] = useState<LeaderboardEntry[]>([]);
   const [selectedCharacter, setSelectedCharacter] = useState<Character | null>(null);
   const [currentLevel, setCurrentLevel] = useState<Level | null>(null);
   const [deaths, setDeaths] = useState(0);
   const [completionTime, setCompletionTime] = useState(0);
+  const [score, setScore] = useState(0);
+  const [coinsCollected, setCoinsCollected] = useState(0);
+  const [totalCoins, setTotalCoins] = useState(0);
+  const [currentCombo, setCurrentCombo] = useState(0);
+  const [maxCombo, setMaxCombo] = useState(0);
 
   useEffect(() => {
     loadGameData();
   }, []);
 
   const loadGameData = async () => {
-    const [charactersData, levelsData] = await Promise.all([getCharacters(), getLevels()]);
+    const [charactersData, levelsData, topScoresData] = await Promise.all([
+      getCharacters(),
+      getLevels(),
+      getTopScores(5),
+    ]);
 
     setCharacters(charactersData);
     setLevels(levelsData);
+    setTopScores(topScoresData);
 
     if (levelsData.length > 0) {
       setCurrentLevel(levelsData[0]);
@@ -37,13 +48,41 @@ export default function Game() {
   const handleCharacterSelect = (character: Character) => {
     setSelectedCharacter(character);
     setDeaths(0);
+    setScore(0);
+    setCoinsCollected(0);
+    setTotalCoins(0);
+    setCurrentCombo(0);
+    setMaxCombo(0);
     setGameState('playing');
   };
 
-  const handleLevelComplete = (time: number, deathCount: number) => {
+  const handleLevelComplete = (
+    time: number,
+    deathCount: number,
+    finalScore: number,
+    coins: number,
+    total: number,
+    combo: number
+  ) => {
     setCompletionTime(time);
     setDeaths(deathCount);
+    setScore(finalScore);
+    setCoinsCollected(coins);
+    setTotalCoins(total);
+    setMaxCombo(combo);
     setGameState('win');
+  };
+
+  const handleGameUpdate = (
+    currentScore: number,
+    coins: number,
+    total: number,
+    combo: number
+  ) => {
+    setScore(currentScore);
+    setCoinsCollected(coins);
+    setTotalCoins(total);
+    setCurrentCombo(combo);
   };
 
   const handleLevelFailed = () => {
@@ -52,12 +91,20 @@ export default function Game() {
 
   const handleRestart = () => {
     setDeaths(0);
+    setScore(0);
+    setCoinsCollected(0);
+    setTotalCoins(0);
+    setCurrentCombo(0);
+    setMaxCombo(0);
     setGameState('playing');
   };
 
-  const handleMainMenu = () => {
+  const handleMainMenu = async () => {
     setSelectedCharacter(null);
     setDeaths(0);
+    // Reload leaderboard to show any new scores
+    const topScoresData = await getTopScores(5);
+    setTopScores(topScoresData);
     setGameState('character-select');
   };
 
@@ -68,7 +115,10 @@ export default function Game() {
         selectedCharacter.name,
         currentLevel.id,
         completionTime,
-        deaths
+        deaths,
+        score,
+        coinsCollected,
+        maxCombo
       );
     }
   };
@@ -82,7 +132,7 @@ export default function Game() {
   }
 
   if (gameState === 'character-select') {
-    return <CharacterSelect characters={characters} onSelect={handleCharacterSelect} />;
+    return <CharacterSelect characters={characters} topScores={topScores} onSelect={handleCharacterSelect} />;
   }
 
   if (gameState === 'playing' && selectedCharacter && currentLevel) {
@@ -95,8 +145,17 @@ export default function Game() {
           level={currentLevel}
           onLevelComplete={handleLevelComplete}
           onLevelFailed={handleLevelFailed}
+          onGameUpdate={handleGameUpdate}
         />
-        <GameUI character={selectedCharacter} level={currentLevel} deaths={deaths} />
+        <GameUI
+          character={selectedCharacter}
+          level={currentLevel}
+          deaths={deaths}
+          score={score}
+          coinsCollected={coinsCollected}
+          totalCoins={totalCoins}
+          currentCombo={currentCombo}
+        />
       </div>
     );
   }
@@ -109,6 +168,10 @@ export default function Game() {
           level={currentLevel}
           completionTime={completionTime}
           deaths={deaths}
+          score={score}
+          coinsCollected={coinsCollected}
+          totalCoins={totalCoins}
+          maxCombo={maxCombo}
           onRestart={handleRestart}
           onMainMenu={handleMainMenu}
           onSubmitScore={handleSubmitScore}

@@ -216,75 +216,80 @@ function drawPig(
   height: number,
   isBlinking: boolean
 ) {
-  ctx.save();
+  // CHIBI STYLE FROM SCRATCH - round body is THE dominant feature
 
-  // Round body (HUGE)
-  const bodyGradient = ctx.createRadialGradient(x + width/2, y + height*0.55, 0, x + width/2, y + height*0.55, width*0.5);
+  // Step 1: MASSIVE WIDE body (takes up most of the character)
+  const bodyGradient = ctx.createRadialGradient(
+    x + width*0.5, y + height*0.5,
+    0,
+    x + width*0.5, y + height*0.5,
+    width*0.5
+  );
   bodyGradient.addColorStop(0, '#FFB6C1');
   bodyGradient.addColorStop(1, '#FF9BAE');
   ctx.fillStyle = bodyGradient;
   ctx.beginPath();
-  ctx.arc(x + width/2, y + height*0.55, width*0.45, 0, Math.PI * 2);
+  // Make it an ellipse - MUCH WIDER than it is tall (fat pig!)
+  ctx.ellipse(x + width*0.5, y + height*0.5, width*0.48, height*0.25, 0, 0, Math.PI * 2);
   ctx.fill();
 
-  // HUGE snout sticking out
+  // Step 2: Big snout on front (overlapping body)
   ctx.fillStyle = '#FFB6C1';
   ctx.beginPath();
-  ctx.ellipse(x + width*0.85, y + height*0.45, 18, 14, 0, 0, Math.PI * 2);
+  ctx.arc(x + width*0.85, y + height*0.5, 8, 0, Math.PI * 2);
   ctx.fill();
 
   // Nostrils
   ctx.fillStyle = '#D4909E';
   ctx.beginPath();
-  ctx.ellipse(x + width*0.82, y + height*0.43, 3, 4, 0, 0, Math.PI * 2);
+  ctx.arc(x + width*0.84, y + height*0.48, 1.5, 0, Math.PI * 2);
   ctx.fill();
   ctx.beginPath();
-  ctx.ellipse(x + width*0.82, y + height*0.48, 3, 4, 0, 0, Math.PI * 2);
+  ctx.arc(x + width*0.84, y + height*0.52, 1.5, 0, Math.PI * 2);
   ctx.fill();
 
-  // HUGE eyes
+  // Step 3: Big eyes ON the body
   if (!isBlinking) {
     ctx.fillStyle = '#000000';
     ctx.beginPath();
-    ctx.arc(x + width*0.62, y + height*0.35, 6, 0, Math.PI * 2);
+    ctx.arc(x + width*0.55, y + height*0.42, 4, 0, Math.PI * 2);
     ctx.fill();
 
+    // Eye highlight
     ctx.fillStyle = '#FFFFFF';
     ctx.beginPath();
-    ctx.arc(x + width*0.64, y + height*0.33, 2.5, 0, Math.PI * 2);
+    ctx.arc(x + width*0.56, y + height*0.41, 1.5, 0, Math.PI * 2);
     ctx.fill();
   } else {
     ctx.strokeStyle = '#000000';
-    ctx.lineWidth = 2;
+    ctx.lineWidth = 1.5;
     ctx.beginPath();
-    ctx.moveTo(x + width*0.62 - 5, y + height*0.35);
-    ctx.lineTo(x + width*0.62 + 5, y + height*0.35);
+    ctx.moveTo(x + width*0.52, y + height*0.42);
+    ctx.lineTo(x + width*0.58, y + height*0.42);
     ctx.stroke();
   }
 
-  // Tiny floppy ear
+  // Step 4: Small ear on top
   ctx.fillStyle = '#FF9BAE';
   ctx.beginPath();
-  ctx.ellipse(x + width*0.35, y + height*0.3, 10, 15, -0.5, 0, Math.PI * 2);
+  ctx.ellipse(x + width*0.3, y + height*0.25, 5, 8, -0.4, 0, Math.PI * 2);
   ctx.fill();
 
-  // Stubby little legs
+  // Step 5: Tiny stubby legs at bottom
   ctx.fillStyle = '#FFB6C1';
   ctx.beginPath();
-  ctx.ellipse(x + width*0.65, y + height*0.88, 6, 10, 0, 0, Math.PI * 2);
+  ctx.arc(x + width*0.6, y + height*0.78, 5, 0, Math.PI * 2);
   ctx.fill();
   ctx.beginPath();
-  ctx.ellipse(x + width*0.35, y + height*0.88, 6, 10, 0, 0, Math.PI * 2);
+  ctx.arc(x + width*0.4, y + height*0.78, 5, 0, Math.PI * 2);
   ctx.fill();
 
-  // Curly tail
+  // Step 6: Small curly tail on back
   ctx.strokeStyle = '#FF9BAE';
-  ctx.lineWidth = 3;
+  ctx.lineWidth = 2;
   ctx.beginPath();
-  ctx.arc(x + width*0.05, y + height*0.5, 8, 0, Math.PI * 1.5);
+  ctx.arc(x + width*0.08, y + height*0.5, 4, 0, Math.PI * 1.5);
   ctx.stroke();
-
-  ctx.restore();
 }
 
 function drawLemur(

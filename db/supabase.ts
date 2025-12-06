@@ -59,6 +59,10 @@ export interface LevelLayout {
     width: number;
     height: number;
   };
+  collectibles?: Array<{
+    x: number;
+    y: number;
+  }>;
 }
 
 export interface LeaderboardEntry {
@@ -68,6 +72,9 @@ export interface LeaderboardEntry {
   level_id: string;
   completion_time: number;
   deaths: number;
+  points: number;
+  coins_collected: number;
+  combo_max: number;
   created_at: string;
 }
 
@@ -116,12 +123,30 @@ export async function getLeaderboard(levelId: string, limit = 10): Promise<Leade
   return data || [];
 }
 
+export async function getTopScores(limit = 5): Promise<LeaderboardEntry[]> {
+  const { data, error } = await supabase
+    .from('leaderboard')
+    .select('*')
+    .order('points', { ascending: false })
+    .limit(limit);
+
+  if (error) {
+    console.error('Error fetching top scores:', error);
+    return [];
+  }
+
+  return data || [];
+}
+
 export async function submitScore(
   playerName: string,
   characterName: string,
   levelId: string,
   completionTime: number,
-  deaths: number
+  deaths: number,
+  points: number,
+  coinsCollected: number,
+  comboMax: number
 ): Promise<boolean> {
   const { error } = await supabase
     .from('leaderboard')
@@ -131,6 +156,9 @@ export async function submitScore(
       level_id: levelId,
       completion_time: completionTime,
       deaths: deaths,
+      points: points,
+      coins_collected: coinsCollected,
+      combo_max: comboMax,
     });
 
   if (error) {
